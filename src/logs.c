@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <time.h>
 
-LogType log_level = LOG_NONE;
+static LogType log_level = LOG_NONE;
+static FILE *log_sink = NULL;
 
 int log_out(LogType log_type, const char *format, ...)
 {
@@ -19,7 +20,7 @@ int log_out(LogType log_type, const char *format, ...)
     strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", t);
 
     // Format the user message
-    char user_msg[100];
+    char user_msg[512];
     va_list args;
     va_start(args, format);
     vsnprintf(user_msg, sizeof(user_msg), format, args);
@@ -47,7 +48,7 @@ int log_out(LogType log_type, const char *format, ...)
     }
 
     // Final output
-    fprintf(stderr, "[%s] [%s] %s\n", time_str, type_str, user_msg);
+    fprintf(log_sink, "[%s] [%s] %s\n", time_str, type_str, user_msg);
 
     return 0;
 }
@@ -58,5 +59,11 @@ int set_log_level(LogType new_log_level)
     char *log_level_strs[6] = {"ALL", "DEBUG", "INFO",
                                "WARNING", "ERORR", "NONE"};
     log_out(LOG_DEBUG, "Log level set to %s", log_level_strs[new_log_level]);
+    return 0;
+}
+
+int set_log_sink(FILE *new_sink)
+{
+    log_sink = new_sink;
     return 0;
 }
