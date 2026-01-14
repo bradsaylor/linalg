@@ -48,8 +48,7 @@ struct ObjLL;
   - Object destruction occurs when the final reference is released via
     `decref_obj()`.
  */
-struct ObjWrapper *create_matrix(struct List elements, size_t num_rows,
-                                 size_t num_cols);
+struct ObjWrapper* create_matrix(struct List elements, size_t num_rows, size_t num_cols);
 
 /**
 @brief
@@ -71,7 +70,7 @@ struct ObjWrapper *create_matrix(struct List elements, size_t num_rows,
     0.
 @warning None.
  */
-struct ObjWrapper *create_vector(struct List elements);
+struct ObjWrapper* create_vector(struct List elements);
 
 /**
 @brief
@@ -90,7 +89,7 @@ struct ObjWrapper *create_vector(struct List elements);
     0.
 @warning
  */
-struct ObjWrapper *create_scalar(double value);
+struct ObjWrapper* create_scalar(double value);
 
 /**
 @brief
@@ -105,7 +104,7 @@ struct ObjWrapper *create_scalar(double value);
 @note Used in debug function `list_bindings()`
 @warning
  */
-enum ObjType get_obj_type(const struct ObjWrapper *wrapper);
+enum ObjType get_obj_type(const struct ObjWrapper* wrapper);
 
 /**
 @brief
@@ -122,7 +121,7 @@ enum ObjType get_obj_type(const struct ObjWrapper *wrapper);
 @note Enforces invariant: Cannot decrement `wrapper` with `ref_count` == 0.
 @warning
  */
-int decref_obj(struct ObjWrapper *wrapper);
+int decref_obj(struct ObjWrapper* wrapper);
 
 /**
 @brief
@@ -140,7 +139,7 @@ int decref_obj(struct ObjWrapper *wrapper);
 @note Enforces invariant: Active object `ref_count` > 0.
 @warning None.
  */
-int incref_obj(struct ObjWrapper *wrapper);
+int incref_obj(struct ObjWrapper* wrapper);
 
 /**
 @brief
@@ -172,6 +171,6 @@ int destroy_obj_list();
 @note None.
 @warning None.
  */
-size_t debug_get_obj_refcount(const struct ObjWrapper *wrapper);
+size_t debug_get_obj_refcount(const struct ObjWrapper* wrapper);
 
 #endif // MATH_OBJS_H

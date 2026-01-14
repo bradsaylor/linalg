@@ -5,7 +5,7 @@
 
 struct List
 {
-    void *list;
+    void* list;
     size_t size;
     size_t type_size;
 };

@@ -42,9 +42,8 @@ int test_debug_get_obj_refcount_01();
  * Helper function prototypes
  * ============================================================================
  */
-int return_valid_matrix_components(struct List *elements, size_t *num_rows,
-                                   size_t *num_cols);
-int return_valid_vector_components(struct List *elements);
+int return_valid_matrix_components(struct List* elements, size_t* num_rows, size_t* num_cols);
+int return_valid_vector_components(struct List* elements);
 #pragma endregion
 
 #pragma region main()
@@ -92,7 +91,7 @@ int test_create_matrix_00()
     // Test case for valid input
     // Also verifies assigned OBJ_TYPE and decref_obj() functionality
 
-    const char *test_name = "test_create_matrix_00";
+    const char* test_name = "test_create_matrix_00";
 
     // validation flags
     bool rtn_comps_OK = false;
@@ -105,11 +104,10 @@ int test_create_matrix_00()
     size_t num_rows = 0;
     size_t num_cols = 0;
 
-    struct ObjWrapper *new_matrix = NULL;
+    struct ObjWrapper* new_matrix = NULL;
 
     // get matrix components
-    int rtn_comps =
-        return_valid_matrix_components(&elements, &num_rows, &num_cols);
+    int rtn_comps = return_valid_matrix_components(&elements, &num_rows, &num_cols);
 
     rtn_comps_OK = (rtn_comps == 0);
     if (rtn_comps_OK == false)
@@ -148,7 +146,7 @@ int test_create_matrix_01()
 {
     //  Violates condition:   1.  elements.list != NULL.
 
-    const char *test_name = "test_create_matrix_01";
+    const char* test_name = "test_create_matrix_01";
 
     // validation flags
     bool rtn_comps_OK = false;
@@ -159,11 +157,10 @@ int test_create_matrix_01()
     size_t num_rows = 0;
     size_t num_cols = 0;
 
-    struct ObjWrapper *new_matrix = NULL;
+    struct ObjWrapper* new_matrix = NULL;
 
     // get matrix components
-    int rtn_comps =
-        return_valid_matrix_components(&elements, &num_rows, &num_cols);
+    int rtn_comps = return_valid_matrix_components(&elements, &num_rows, &num_cols);
 
     rtn_comps_OK = (rtn_comps == 0);
     if (rtn_comps_OK == false)
@@ -173,7 +170,7 @@ int test_create_matrix_01()
     }
 
     // Store allocated List.list for freeing on failure
-    double *old_list = elements.list;
+    double* old_list = elements.list;
     // Replace valid List.list with invalid one
     elements.list = NULL;
 
@@ -197,7 +194,7 @@ int test_create_matrix_02()
 {
     //  Violates condition:   2.  elements.type_size > 0.
 
-    const char *test_name = "test_create_matrix_02";
+    const char* test_name = "test_create_matrix_02";
 
     // validation flags
     bool rtn_comps_OK = false;
@@ -208,11 +205,10 @@ int test_create_matrix_02()
     size_t num_rows = 0;
     size_t num_cols = 0;
 
-    struct ObjWrapper *new_matrix = NULL;
+    struct ObjWrapper* new_matrix = NULL;
 
     // get matrix components
-    int rtn_comps =
-        return_valid_matrix_components(&elements, &num_rows, &num_cols);
+    int rtn_comps = return_valid_matrix_components(&elements, &num_rows, &num_cols);
 
     rtn_comps_OK = (rtn_comps == 0);
     if (rtn_comps_OK == false)
@@ -243,7 +239,7 @@ int test_create_matrix_03()
 {
     //  Violates condition:   3.  num_rows > 0.
 
-    const char *test_name = "test_create_matrix_03";
+    const char* test_name = "test_create_matrix_03";
 
     // validation flags
     bool rtn_comps_OK = false;
@@ -254,11 +250,10 @@ int test_create_matrix_03()
     size_t num_rows = 0;
     size_t num_cols = 0;
 
-    struct ObjWrapper *new_matrix = NULL;
+    struct ObjWrapper* new_matrix = NULL;
 
     // get matrix components
-    int rtn_comps =
-        return_valid_matrix_components(&elements, &num_rows, &num_cols);
+    int rtn_comps = return_valid_matrix_components(&elements, &num_rows, &num_cols);
 
     rtn_comps_OK = (rtn_comps == 0);
     if (rtn_comps_OK == false)
@@ -289,7 +284,7 @@ int test_create_matrix_04()
 {
     //  Violates condition:   4.  num_cols > 0.
 
-    const char *test_name = "test_create_matrix_04";
+    const char* test_name = "test_create_matrix_04";
 
     // validation flags
     bool rtn_comps_OK = false;
@@ -300,11 +295,10 @@ int test_create_matrix_04()
     size_t num_rows = 0;
     size_t num_cols = 0;
 
-    struct ObjWrapper *new_matrix = NULL;
+    struct ObjWrapper* new_matrix = NULL;
 
     // get matrix components
-    int rtn_comps =
-        return_valid_matrix_components(&elements, &num_rows, &num_cols);
+    int rtn_comps = return_valid_matrix_components(&elements, &num_rows, &num_cols);
 
     rtn_comps_OK = (rtn_comps == 0);
     if (rtn_comps_OK == false)
@@ -335,7 +329,7 @@ int test_create_matrix_05()
 {
     //  Violates condition:   5.  elements.size == num_rows * num_cols.
 
-    const char *test_name = "test_create_matrix_05";
+    const char* test_name = "test_create_matrix_05";
 
     // validation flags
     bool rtn_comps_OK = false;
@@ -346,11 +340,10 @@ int test_create_matrix_05()
     size_t num_rows = 0;
     size_t num_cols = 0;
 
-    struct ObjWrapper *new_matrix = NULL;
+    struct ObjWrapper* new_matrix = NULL;
 
     // get matrix components
-    int rtn_comps =
-        return_valid_matrix_components(&elements, &num_rows, &num_cols);
+    int rtn_comps = return_valid_matrix_components(&elements, &num_rows, &num_cols);
 
     rtn_comps_OK = (rtn_comps == 0);
     if (rtn_comps_OK == false)
@@ -388,7 +381,7 @@ int test_create_vector_00()
     // Test case for valid input
     // Also verifies assigned OBJ_TYPE and decref_obj() functionality
 
-    const char *test_name = "test_create_vector_00";
+    const char* test_name = "test_create_vector_00";
 
     // validation flags
     bool rtn_comps_OK = false;
@@ -399,7 +392,7 @@ int test_create_vector_00()
     // components for vector construction
     struct List elements = {0};
 
-    struct ObjWrapper *new_vector = NULL;
+    struct ObjWrapper* new_vector = NULL;
 
     // get vector list
     int rtn_comps = return_valid_vector_components(&elements);
@@ -441,7 +434,7 @@ int test_create_vector_01()
 {
     //  Violates condition:   1.  elements.list != NULL.
 
-    const char *test_name = "test_create_vector_01";
+    const char* test_name = "test_create_vector_01";
 
     // validation flags
     bool rtn_comps_OK = false;
@@ -450,7 +443,7 @@ int test_create_vector_01()
     // components for vector construction
     struct List elements = {0};
 
-    struct ObjWrapper *new_vector = NULL;
+    struct ObjWrapper* new_vector = NULL;
 
     // get vector list
     int rtn_comps = return_valid_vector_components(&elements);
@@ -463,7 +456,7 @@ int test_create_vector_01()
     }
 
     // Store allocated List.list for freeing on failure
-    double *old_list = elements.list;
+    double* old_list = elements.list;
     // Replace valid List.list with invalid one
     elements.list = NULL;
 
@@ -487,7 +480,7 @@ int test_create_vector_02()
 {
     //  Violates condition:   2.  elements.type_size > 0.
 
-    const char *test_name = "test_create_vector_02";
+    const char* test_name = "test_create_vector_02";
 
     // validation flags
     bool rtn_comps_OK = false;
@@ -496,7 +489,7 @@ int test_create_vector_02()
     // components for vector construction
     struct List elements = {0};
 
-    struct ObjWrapper *new_vector = NULL;
+    struct ObjWrapper* new_vector = NULL;
 
     // get vector list
     int rtn_comps = return_valid_vector_components(&elements);
@@ -530,7 +523,7 @@ int test_create_vector_03()
 {
     //  Violates condition:   3.  elements.size > 0.
 
-    const char *test_name = "test_create_vector_03";
+    const char* test_name = "test_create_vector_03";
 
     // validation flags
     bool rtn_comps_OK = false;
@@ -539,7 +532,7 @@ int test_create_vector_03()
     // components for vector construction
     struct List elements = {0};
 
-    struct ObjWrapper *new_vector = NULL;
+    struct ObjWrapper* new_vector = NULL;
 
     // get vector list
     int rtn_comps = return_valid_vector_components(&elements);
@@ -589,13 +582,13 @@ int test_decref_obj_00()
 {
     // test case for valid input
 
-    const char *test_name = "test_decref_obj_00";
+    const char* test_name = "test_decref_obj_00";
 
     bool create_obj_OK = false;
     bool decref_obj_OK = false;
 
     // create ObjWrapper
-    struct ObjWrapper *new_scalar = create_scalar(3.14);
+    struct ObjWrapper* new_scalar = create_scalar(3.14);
 
     create_obj_OK = (new_scalar != NULL);
     if (create_obj_OK == false)
@@ -619,11 +612,11 @@ int test_decref_obj_01()
 {
     //  Violates condition:   1.  wrapper != NULL.
 
-    const char *test_name = "test_decref_obj_01";
+    const char* test_name = "test_decref_obj_01";
 
     bool decref_obj_rtn_1 = false;
 
-    struct ObjWrapper *null_wrapper = NULL;
+    struct ObjWrapper* null_wrapper = NULL;
 
     decref_obj_rtn_1 = (decref_obj(null_wrapper) == 1);
     if (decref_obj_rtn_1 == false)
@@ -646,13 +639,13 @@ int test_incref_obj_00()
 {
     // test case for valid input
 
-    const char *test_name = "test_incref_obj_00";
+    const char* test_name = "test_incref_obj_00";
 
     bool create_obj_OK = false;
     bool incref_obj_OK = false;
 
     // create ObjWrapper
-    struct ObjWrapper *new_scalar = create_scalar(3.14);
+    struct ObjWrapper* new_scalar = create_scalar(3.14);
 
     create_obj_OK = (new_scalar != NULL);
     if (create_obj_OK == false)
@@ -679,11 +672,11 @@ int test_incref_obj_01()
 {
     //  Violates condition:   1.  wrapper != NULL.
 
-    const char *test_name = "test_incref_obj_01";
+    const char* test_name = "test_incref_obj_01";
 
     bool incref_obj_rtn_1 = false;
 
-    struct ObjWrapper *null_wrapper = NULL;
+    struct ObjWrapper* null_wrapper = NULL;
 
     incref_obj_rtn_1 = (incref_obj(null_wrapper) == 1);
     if (incref_obj_rtn_1 == false)
@@ -706,12 +699,12 @@ int test_get_obj_type_00()
 {
     // test for valid input
 
-    const char *test_name = "test_get_obj_type_00";
+    const char* test_name = "test_get_obj_type_00";
 
     bool create_obj_OK = false;
     bool get_obj_type_OK = false;
 
-    struct ObjWrapper *new_scalar = create_scalar(3.14);
+    struct ObjWrapper* new_scalar = create_scalar(3.14);
 
     create_obj_OK = (new_scalar != NULL);
     if (create_obj_OK == false)
@@ -737,11 +730,11 @@ int test_get_obj_type_01()
 {
     //  Violates condition:   1.  wrapper != NULL.
 
-    const char *test_name = "test_get_obj_type_01";
+    const char* test_name = "test_get_obj_type_01";
 
     bool rtn_OBJ_NONE = false;
 
-    struct ObjWrapper *null_wrapper = NULL;
+    struct ObjWrapper* null_wrapper = NULL;
 
     rtn_OBJ_NONE = (get_obj_type(null_wrapper) == OBJ_NONE);
     if (rtn_OBJ_NONE == false)
@@ -773,12 +766,12 @@ int test_debug_get_obj_refcount_00()
 {
     // test for valid input
 
-    const char *test_name = "test_debug_get_obj_refcount_00";
+    const char* test_name = "test_debug_get_obj_refcount_00";
 
     bool create_obj_OK = false;
     bool debug_get_obj_refcount_rtn_OK = false;
 
-    struct ObjWrapper *new_scalar = create_scalar(3.14);
+    struct ObjWrapper* new_scalar = create_scalar(3.14);
 
     create_obj_OK = (new_scalar != NULL);
     if (create_obj_OK == false)
@@ -803,11 +796,11 @@ int test_debug_get_obj_refcount_01()
 {
     // Violates condition:     1. wrapper != NULL.
 
-    const char *test_name = "test_debug_get_obj_refcount_01";
+    const char* test_name = "test_debug_get_obj_refcount_01";
 
     bool rtns_minus_1 = false;
 
-    struct ObjWrapper *null_wrapper = NULL;
+    struct ObjWrapper* null_wrapper = NULL;
 
     rtns_minus_1 = (debug_get_obj_refcount(null_wrapper) == -1);
     if (rtns_minus_1 == false)
@@ -833,15 +826,14 @@ int test_debug_get_obj_refcount_01()
   Allocates element_list which must be freed by caller.
   Valid components means `element_list_size` == `rows` * `cols`.
  */
-int return_valid_matrix_components(struct List *elements, size_t *num_rows,
-                                   size_t *num_cols)
+int return_valid_matrix_components(struct List* elements, size_t* num_rows, size_t* num_cols)
 {
     size_t element_list_size = 8;
     size_t rows = 4;
     size_t cols = 2;
 
     double list_to_copy[8] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
-    double *element_list = malloc(element_list_size * sizeof(double));
+    double* element_list = malloc(element_list_size * sizeof(double));
     if (!element_list)
         return 2; // allocation failure
 
@@ -862,12 +854,12 @@ int return_valid_matrix_components(struct List *elements, size_t *num_rows,
   Returns valid list for constructing vector object.
   Allocates element_list which must be freed by caller.
  */
-int return_valid_vector_components(struct List *elements)
+int return_valid_vector_components(struct List* elements)
 {
     size_t element_list_size = 8;
 
     double list_to_copy[8] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
-    double *element_list = malloc(element_list_size * sizeof(double));
+    double* element_list = malloc(element_list_size * sizeof(double));
     if (!element_list)
         return 2; // allocation failure
 

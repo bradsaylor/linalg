@@ -11,7 +11,7 @@
 
 struct ObjWrapper
 {
-    void *obj;
+    void* obj;
     enum ObjType type;
     size_t ref_count;
 };
@@ -35,13 +35,13 @@ struct Scalar
 
 struct ObjLLNode
 {
-    struct ObjWrapper *object;
-    struct ObjLLNode *next;
+    struct ObjWrapper* object;
+    struct ObjLLNode* next;
 };
 
 struct ObjLL
 {
-    struct ObjLLNode *head;
+    struct ObjLLNode* head;
     size_t count;
 };
 
@@ -53,15 +53,14 @@ static struct ObjLL obj_list;
  * Private function prototypes
  * ============================================================================
  */
-int destroy_matrix(struct Matrix *matrix);
-int destroy_vector(struct Vector *vector);
-int destroy_scalar(struct Scalar *scalar);
-int destroy_wrapper(struct ObjWrapper *wrapper);
-int add_object(struct ObjWrapper *object);
-int remove_object(struct ObjWrapper *object);
-int destroy_obj(struct ObjWrapper *wrapper);
-struct ObjLLNode *find_node(struct ObjWrapper *wrapper,
-                            struct ObjLLNode *prev_node);
+int destroy_matrix(struct Matrix* matrix);
+int destroy_vector(struct Vector* vector);
+int destroy_scalar(struct Scalar* scalar);
+int destroy_wrapper(struct ObjWrapper* wrapper);
+int add_object(struct ObjWrapper* object);
+int remove_object(struct ObjWrapper* object);
+int destroy_obj(struct ObjWrapper* wrapper);
+struct ObjLLNode* find_node(struct ObjWrapper* wrapper, struct ObjLLNode* prev_node);
 #pragma endregion
 
 #pragma region Public API
@@ -77,8 +76,7 @@ struct ObjLLNode *find_node(struct ObjWrapper *wrapper,
 //   4.  num_cols > 0.
 //   5.  elements.size == num_rows * num_cols.
 // Post conditions: None.
-struct ObjWrapper *create_matrix(struct List elements, size_t num_rows,
-                                 size_t num_cols)
+struct ObjWrapper* create_matrix(struct List elements, size_t num_rows, size_t num_cols)
 {
     if (!elements.list)
         return NULL; // No matrix element list
@@ -92,11 +90,11 @@ struct ObjWrapper *create_matrix(struct List elements, size_t num_rows,
         return NULL; // zero type size
 
     // Allocate matrix object and wrapper
-    struct Matrix *new_matrix = malloc(sizeof(struct Matrix));
+    struct Matrix* new_matrix = malloc(sizeof(struct Matrix));
     if (!new_matrix)
         return NULL;
 
-    struct ObjWrapper *new_wrapper = malloc(sizeof(struct ObjWrapper));
+    struct ObjWrapper* new_wrapper = malloc(sizeof(struct ObjWrapper));
     if (!new_wrapper)
     {
         free(new_matrix);
@@ -131,7 +129,7 @@ struct ObjWrapper *create_matrix(struct List elements, size_t num_rows,
 //    2.  elements.size > 0.
 //    3.  elements.type_size > 0.
 //  Post conditions: None.
-struct ObjWrapper *create_vector(struct List elements)
+struct ObjWrapper* create_vector(struct List elements)
 {
     // Check elements to make sure we have list, size, and type_size
     if (!elements.list)
@@ -141,11 +139,11 @@ struct ObjWrapper *create_vector(struct List elements)
     if (elements.type_size == 0)
         return NULL; // zero type size
 
-    struct Vector *new_vector = malloc(sizeof(struct Vector));
+    struct Vector* new_vector = malloc(sizeof(struct Vector));
     if (!new_vector)
         return NULL;
 
-    struct ObjWrapper *new_wrapper = malloc(sizeof(struct ObjWrapper));
+    struct ObjWrapper* new_wrapper = malloc(sizeof(struct ObjWrapper));
     if (!new_wrapper)
     {
         free(new_vector);
@@ -172,12 +170,12 @@ struct ObjWrapper *create_vector(struct List elements)
 
 //  Pre conditions: None.
 //  Post conditions: None.
-struct ObjWrapper *create_scalar(double value)
+struct ObjWrapper* create_scalar(double value)
 {
-    struct Scalar *new_scalar = malloc(sizeof(struct Scalar));
+    struct Scalar* new_scalar = malloc(sizeof(struct Scalar));
     if (!new_scalar)
         return NULL;
-    struct ObjWrapper *new_wrapper = malloc(sizeof(struct ObjWrapper));
+    struct ObjWrapper* new_wrapper = malloc(sizeof(struct ObjWrapper));
     if (!new_wrapper)
     {
         free(new_scalar);
@@ -201,13 +199,12 @@ struct ObjWrapper *create_scalar(double value)
     return new_wrapper;
 }
 
-int destroy_obj(struct ObjWrapper *wrapper)
+int destroy_obj(struct ObjWrapper* wrapper)
 {
     if (!wrapper)
         return 0; // no wrapper is noop
 
-    if (wrapper->type != OBJ_MATRIX && wrapper->type != OBJ_VECTOR &&
-        wrapper->type != OBJ_SCALAR)
+    if (wrapper->type != OBJ_MATRIX && wrapper->type != OBJ_VECTOR && wrapper->type != OBJ_SCALAR)
         return 4; // invalid type
 
     int remove_ret = remove_object(wrapper);
@@ -217,15 +214,15 @@ int destroy_obj(struct ObjWrapper *wrapper)
     switch (wrapper->type)
     {
     case OBJ_MATRIX:
-        destroy_matrix((struct Matrix *)wrapper->obj);
+        destroy_matrix((struct Matrix*)wrapper->obj);
         wrapper->obj = NULL;
         break;
     case OBJ_VECTOR:
-        destroy_vector((struct Vector *)wrapper->obj);
+        destroy_vector((struct Vector*)wrapper->obj);
         wrapper->obj = NULL;
         break;
     case OBJ_SCALAR:
-        destroy_scalar((struct Scalar *)wrapper->obj);
+        destroy_scalar((struct Scalar*)wrapper->obj);
         wrapper->obj = NULL;
         break;
     default:
@@ -238,7 +235,7 @@ int destroy_obj(struct ObjWrapper *wrapper)
 // pre conditions:
 //  1.  wrapper != NULL.
 // post conditions: None.
-int incref_obj(struct ObjWrapper *wrapper)
+int incref_obj(struct ObjWrapper* wrapper)
 {
     if (!wrapper)
         return 1; // caller error
@@ -252,7 +249,7 @@ int incref_obj(struct ObjWrapper *wrapper)
 //  Pre conditions:
 //    1.  wrapper != NULL.
 //  Post conditions: None.
-int decref_obj(struct ObjWrapper *wrapper)
+int decref_obj(struct ObjWrapper* wrapper)
 {
     if (!wrapper)
         return 1; // caller error
@@ -271,7 +268,7 @@ int decref_obj(struct ObjWrapper *wrapper)
 //  Pre conditions:
 //    1.  wrapper != NULL.
 //  Post conditions: None.
-enum ObjType get_obj_type(const struct ObjWrapper *wrapper)
+enum ObjType get_obj_type(const struct ObjWrapper* wrapper)
 {
     if (!wrapper)
         return OBJ_NONE; // wrapper is NULL
@@ -305,7 +302,7 @@ int destroy_obj_list()
 //  Pre conditions:
 //   1. wrapper != NULL.
 //  post conditions: None.
-size_t debug_get_obj_refcount(const struct ObjWrapper *wrapper)
+size_t debug_get_obj_refcount(const struct ObjWrapper* wrapper)
 {
 #ifdef NDEBUG
     return -1;
@@ -328,7 +325,7 @@ size_t debug_get_obj_refcount(const struct ObjWrapper *wrapper)
 //  Effects: `matrix` and `matrix->elements.list` freed.
 //  Returns: 0 in all cases.
 //  Notes: None.
-int destroy_matrix(struct Matrix *matrix)
+int destroy_matrix(struct Matrix* matrix)
 {
     if (!matrix)
         return 0;
@@ -342,7 +339,7 @@ int destroy_matrix(struct Matrix *matrix)
 //  Effects: `vector` and `vector->elements.list` freed.
 //  Returns: 0 in all cases.
 //  Notes: None.
-int destroy_vector(struct Vector *vector)
+int destroy_vector(struct Vector* vector)
 {
     if (!vector)
         return 0;
@@ -356,7 +353,7 @@ int destroy_vector(struct Vector *vector)
 //  Effects: `scalar` freed.
 //  Returns: 0 in all cases.
 //  Notes: None.
-int destroy_scalar(struct Scalar *scalar)
+int destroy_scalar(struct Scalar* scalar)
 {
     if (!scalar)
         return 0;
@@ -369,7 +366,7 @@ int destroy_scalar(struct Scalar *scalar)
 //  Effects: `wrapper` freed.
 //  Returns: 0 in all cases.
 //  Notes: None.
-int destroy_wrapper(struct ObjWrapper *wrapper)
+int destroy_wrapper(struct ObjWrapper* wrapper)
 {
     if (!wrapper)
         return 0;
@@ -386,20 +383,20 @@ int destroy_wrapper(struct ObjWrapper *wrapper)
 //    2: Allocation error.
 //    3: Internal invariance violation.
 //  Notes: Enforces invariant: one `obj_list` reference per object.
-int add_object(struct ObjWrapper *object)
+int add_object(struct ObjWrapper* object)
 {
     // return immediately for invalid input
     if (!object)
         return 1; // caller error
 
     // check if object is already in the object list
-    struct ObjLLNode *prev_node = NULL;
-    struct ObjLLNode *found_node = find_node(object, prev_node);
+    struct ObjLLNode* prev_node = NULL;
+    struct ObjLLNode* found_node = find_node(object, prev_node);
     if (found_node)
         return 3; // invariant violation
 
     // create new object list node
-    struct ObjLLNode *new_node = malloc(sizeof(struct ObjLLNode));
+    struct ObjLLNode* new_node = malloc(sizeof(struct ObjLLNode));
     if (!new_node)
         return 2; // allocation error
 
@@ -425,15 +422,15 @@ int add_object(struct ObjWrapper *object)
 //  Notes:
 //    - Enforces invariant: Removal not allowed from empty `obj_list`.
 //    - Enforces invariant: `obj_list.head` must exist.
-int remove_object(struct ObjWrapper *object)
+int remove_object(struct ObjWrapper* object)
 {
     if (!object)
         return 1; // caller error
     if (obj_list.count == 0 || obj_list.head == NULL)
         return 3; // internal error
 
-    struct ObjLLNode *prev_node = NULL;
-    struct ObjLLNode *search_node = find_node(object, prev_node);
+    struct ObjLLNode* prev_node = NULL;
+    struct ObjLLNode* search_node = find_node(object, prev_node);
 
     // node found
     if (search_node)
@@ -467,10 +464,9 @@ int remove_object(struct ObjWrapper *object)
 //  Notes:
 //    `prev_node` populated if `wrapper` found and `wrapper` is not the first
 //    list element.
-struct ObjLLNode *find_node(struct ObjWrapper *wrapper,
-                            struct ObjLLNode *prev_node)
+struct ObjLLNode* find_node(struct ObjWrapper* wrapper, struct ObjLLNode* prev_node)
 {
-    struct ObjLLNode *search_node = obj_list.head;
+    struct ObjLLNode* search_node = obj_list.head;
     while (search_node)
     {
         if (search_node->object == wrapper)

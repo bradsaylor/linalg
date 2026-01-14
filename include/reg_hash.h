@@ -44,7 +44,7 @@ struct RegistryHash;
 @note
   Caller owns the returned registry and must destroy it with
   destroy_reg_table().*/
-struct RegistryHash *init_reg_table(size_t table_size);
+struct RegistryHash* init_reg_table(size_t table_size);
 
 /**
 @brief
@@ -66,7 +66,7 @@ struct RegistryHash *init_reg_table(size_t table_size);
 @warning
   Will destroy all objects bound in the registry table.
  */
-int destroy_reg_table(struct RegistryHash *reg_table);
+int destroy_reg_table(struct RegistryHash* reg_table);
 
 /**
 @brief
@@ -100,8 +100,7 @@ int destroy_reg_table(struct RegistryHash *reg_table);
 @warning
   Registry's decref_obj() call may destroy the previously bound object if
   overwritten.*/
-int add_binding(const char *name, struct ObjWrapper *object,
-                struct RegistryHash *reg_table);
+int add_binding(const char* name, struct ObjWrapper* object, struct RegistryHash* reg_table);
 
 /**
 @brief Remove a binding by name.
@@ -126,7 +125,7 @@ int add_binding(const char *name, struct ObjWrapper *object,
 @warning
   Call to decref_obj() may destroy the bound object.
  */
-int remove_binding(const char *name, struct RegistryHash *reg_table);
+int remove_binding(const char* name, struct RegistryHash* reg_table);
 
 /**
 @brief
@@ -143,8 +142,7 @@ int remove_binding(const char *name, struct RegistryHash *reg_table);
 @post No side effects; does not modify registry or refcounts.
 @note Returned pointer is borrowed; caller must not free/destroy it.
  */
-struct ObjWrapper *lookup_binding(const char *name,
-                                  struct RegistryHash *reg_table);
+struct ObjWrapper* lookup_binding(const char* name, struct RegistryHash* reg_table);
 
 /**
 @brief
@@ -158,6 +156,6 @@ struct ObjWrapper *lookup_binding(const char *name,
 @post None.
 @note Prints out name, ref_count, and address for all bindings
  */
-int list_bindings(struct RegistryHash *reg_table);
+int list_bindings(struct RegistryHash* reg_table);
 
 #endif // REG_HASH_H

@@ -38,14 +38,14 @@
  */
 struct RegistryLL
 {
-    struct ObjWrapper *object; // non-owning, lifetime via ref_count
-    char *name;                // owning, must free on unbind
-    struct RegistryLL *next;
+    struct ObjWrapper* object; // non-owning, lifetime via ref_count
+    char* name;                // owning, must free on unbind
+    struct RegistryLL* next;
 };
 
 struct RegistryHash
 {
-    struct RegistryLL **table;
+    struct RegistryLL** table;
     size_t size;
 };
 #pragma endregion
@@ -56,19 +56,17 @@ struct RegistryHash
  * ============================================================================
  */
 
-unsigned int hash(const char *s); // from K&R 'C programming language'
-struct RegistryLL *find_node(struct RegistryLL **prev_node,
-                             struct RegistryHash *reg_table, const char *name,
-                             size_t index);
-char *copy_name(const char *name);
-int add_node(struct RegistryLL *new_node, struct RegistryLL **list_head);
-int remove_node(struct RegistryLL *node, struct RegistryLL *prev_node,
-                struct RegistryLL **list_head);
-int add_binding_already_bound(struct ObjWrapper *new_wrapper,
-                              struct ObjWrapper *old_wrapper);
-int add_binding_new_binding(const char *name, struct ObjWrapper *new_wrapper,
-                            struct RegistryHash *reg_table, size_t index);
-int free_registry_node(struct RegistryLL *node);
+unsigned int hash(const char* s); // from K&R 'C programming language'
+struct RegistryLL* find_node(struct RegistryLL** prev_node, struct RegistryHash* reg_table,
+                             const char* name, size_t index);
+char* copy_name(const char* name);
+int add_node(struct RegistryLL* new_node, struct RegistryLL** list_head);
+int remove_node(struct RegistryLL* node, struct RegistryLL* prev_node,
+                struct RegistryLL** list_head);
+int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjWrapper* old_wrapper);
+int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrapper,
+                            struct RegistryHash* reg_table, size_t index);
+int free_registry_node(struct RegistryLL* node);
 #pragma endregion
 
 #pragma region Public API
@@ -81,13 +79,13 @@ int free_registry_node(struct RegistryLL *node);
 // Allocates Binding Registry structure and hash table.
 // Caller must use destroy_reg_table() for cleanup.
 // Allocation failures return NULL
-struct RegistryHash *init_reg_table(size_t table_size)
+struct RegistryHash* init_reg_table(size_t table_size)
 {
-    struct RegistryHash *reg_table = malloc(sizeof(struct RegistryHash));
+    struct RegistryHash* reg_table = malloc(sizeof(struct RegistryHash));
     if (!reg_table)
         return NULL;
     // calloc -> initialize to zero
-    struct RegistryLL **table = calloc(table_size, sizeof(struct RegistryLL *));
+    struct RegistryLL** table = calloc(table_size, sizeof(struct RegistryLL*));
     if (!table)
     {
         free(reg_table);
@@ -100,15 +98,15 @@ struct RegistryHash *init_reg_table(size_t table_size)
 }
 
 // Returns 0 regardless of success/failure.
-int destroy_reg_table(struct RegistryHash *reg_table)
+int destroy_reg_table(struct RegistryHash* reg_table)
 {
     if (!reg_table)
         return 0; // return 0 if passed NULL
 
     for (size_t i = 0; i < reg_table->size; i++)
     {
-        struct RegistryLL *node = reg_table->table[i];
-        struct RegistryLL *next_node = NULL;
+        struct RegistryLL* node = reg_table->table[i];
+        struct RegistryLL* next_node = NULL;
 
         while (node)
         {
@@ -124,8 +122,7 @@ int destroy_reg_table(struct RegistryHash *reg_table)
     return 0;
 }
 
-int add_binding(const char *name, struct ObjWrapper *object,
-                struct RegistryHash *reg_table)
+int add_binding(const char* name, struct ObjWrapper* object, struct RegistryHash* reg_table)
 {
     // return immediately on invalid input
     if (!name || name[0] == '\0' || !object || !reg_table || reg_table->size == 0)
@@ -133,9 +130,8 @@ int add_binding(const char *name, struct ObjWrapper *object,
 
     // local defines
     size_t index = hash(name) % reg_table->size;
-    struct RegistryLL *prev_node = NULL;
-    struct RegistryLL *already_bound =
-        find_node(&prev_node, reg_table, name, index);
+    struct RegistryLL* prev_node = NULL;
+    struct RegistryLL* already_bound = find_node(&prev_node, reg_table, name, index);
 
     // if name already bound
     if (already_bound)
@@ -147,7 +143,7 @@ int add_binding(const char *name, struct ObjWrapper *object,
     return add_binding_new_binding(name, object, reg_table, index);
 }
 
-int remove_binding(const char *name, struct RegistryHash *reg_table)
+int remove_binding(const char* name, struct RegistryHash* reg_table)
 {
     // return immediately on invalid input
     if (!name || name[0] == '\0' || !reg_table || reg_table->size == 0)
@@ -155,8 +151,8 @@ int remove_binding(const char *name, struct RegistryHash *reg_table)
 
     // local defines
     size_t index = hash(name) % reg_table->size;
-    struct RegistryLL *prev_node = NULL;
-    struct RegistryLL *found_node = find_node(&prev_node, reg_table, name, index);
+    struct RegistryLL* prev_node = NULL;
+    struct RegistryLL* found_node = find_node(&prev_node, reg_table, name, index);
 
     // binding not found or missing wrapper
     if (!found_node)
@@ -175,16 +171,15 @@ int remove_binding(const char *name, struct RegistryHash *reg_table)
     return 0;
 }
 
-struct ObjWrapper *lookup_binding(const char *name,
-                                  struct RegistryHash *reg_table)
+struct ObjWrapper* lookup_binding(const char* name, struct RegistryHash* reg_table)
 {
     if (!name || name[0] == '\0' || !reg_table || reg_table->size == 0)
         return NULL; // caller error
     size_t table_size = reg_table->size;
     size_t index = hash(name) % table_size;
-    struct RegistryLL *prev = NULL;
+    struct RegistryLL* prev = NULL;
 
-    struct RegistryLL *node = find_node(&prev, reg_table, name, index);
+    struct RegistryLL* node = find_node(&prev, reg_table, name, index);
 
     if (!node)
         return NULL;
@@ -193,7 +188,7 @@ struct ObjWrapper *lookup_binding(const char *name,
 }
 
 // Diagnostic: prints current registry bindings; no side effects
-int list_bindings(struct RegistryHash *reg_table)
+int list_bindings(struct RegistryHash* reg_table)
 {
     if (!reg_table)
         return 1; // no reg_table
@@ -201,15 +196,15 @@ int list_bindings(struct RegistryHash *reg_table)
         return 1; // no table
 
     size_t table_size = reg_table->size;
-    struct RegistryLL **table = reg_table->table;
-    struct RegistryLL *node;
+    struct RegistryLL** table = reg_table->table;
+    struct RegistryLL* node;
 
     for (size_t i = 0; i < table_size; i++)
     {
         node = table[i];
         while (node)
         {
-            printf("%s -> %p (type=%d, refs=%zu)\n", node->name, (void *)node->object,
+            printf("%s -> %p (type=%d, refs=%zu)\n", node->name, (void*)node->object,
                    get_obj_type(node->object), debug_get_obj_refcount(node->object));
             node = node->next;
         }
@@ -231,7 +226,7 @@ int list_bindings(struct RegistryHash *reg_table)
 //  Returns:
 //    h: unsigned hash of s.
 //  Note: from K&R 'The C Programming Language'
-static unsigned int hash(const char *s)
+static unsigned int hash(const char* s)
 {
     unsigned int h = 0;
     while (*s)
@@ -251,14 +246,13 @@ static unsigned int hash(const char *s)
 //    Success: Registry node.
 //    Not found: NULL.
 //  Note: prev_node only valid on non_NULL return.
-static struct RegistryLL *find_node(struct RegistryLL **prev_node,
-                                    struct RegistryHash *reg_table,
-                                    const char *name, size_t index)
+static struct RegistryLL* find_node(struct RegistryLL** prev_node, struct RegistryHash* reg_table,
+                                    const char* name, size_t index)
 {
-    struct RegistryLL **table = reg_table->table;
+    struct RegistryLL** table = reg_table->table;
     *prev_node = NULL;
 
-    struct RegistryLL *node = table[index];
+    struct RegistryLL* node = table[index];
     while (node)
     {
         if (!strcmp(name, node->name))
@@ -280,10 +274,10 @@ static struct RegistryLL *find_node(struct RegistryLL **prev_node,
 //    Success: copied name char*
 //    Allocation failure: NULL
 //  Note: Copied name is owned/freed by registry node
-static char *copy_name(const char *name)
+static char* copy_name(const char* name)
 {
     size_t str_len = strlen(name) + 1;
-    char *name_copy = malloc(str_len);
+    char* name_copy = malloc(str_len);
     if (!name_copy)
         return NULL;
     strcpy(name_copy, name);
@@ -297,8 +291,7 @@ static char *copy_name(const char *name)
 //    0: Success.
 //    1: Invalid input.
 //  Note:
-static int add_node(struct RegistryLL *new_node,
-                    struct RegistryLL **list_head)
+static int add_node(struct RegistryLL* new_node, struct RegistryLL** list_head)
 {
     if (!new_node || !list_head)
         return 1; // call error
@@ -311,8 +304,8 @@ static int add_node(struct RegistryLL *new_node,
 // Unlinks `node` from the list headed by `*list_head`.
 // Does NOT free `node` or `node->name`.
 // Caller is responsible for freeing memory and handling refcounts.
-static int remove_node(struct RegistryLL *node, struct RegistryLL *prev_node,
-                       struct RegistryLL **list_head)
+static int remove_node(struct RegistryLL* node, struct RegistryLL* prev_node,
+                       struct RegistryLL** list_head)
 {
     if (!node || !list_head)
         return 3; // call error
@@ -334,8 +327,7 @@ static int remove_node(struct RegistryLL *node, struct RegistryLL *prev_node,
 //    0: On success.
 //    5: On failed incref_obj()
 //  Notes: Failed decref_obj() is an invariant violation
-int add_binding_already_bound(struct ObjWrapper *new_wrapper,
-                              struct ObjWrapper *old_wrapper)
+int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjWrapper* old_wrapper)
 {
     if (new_wrapper == old_wrapper)
     { // already bound to object
@@ -370,14 +362,14 @@ int add_binding_already_bound(struct ObjWrapper *new_wrapper,
 //    2: Allocation failure.
 //    5: Incref_obj() failure.
 //  Notes: None.
-int add_binding_new_binding(const char *name, struct ObjWrapper *new_wrapper,
-                            struct RegistryHash *reg_table, size_t index)
+int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrapper,
+                            struct RegistryHash* reg_table, size_t index)
 {
-    char *new_name = copy_name(name);
+    char* new_name = copy_name(name);
     if (!new_name)
         return 2; // allocation failure
 
-    struct RegistryLL *new_node = malloc(sizeof(struct RegistryLL));
+    struct RegistryLL* new_node = malloc(sizeof(struct RegistryLL));
     if (!new_node)
     {
         free(new_name);
@@ -418,7 +410,7 @@ int add_binding_new_binding(const char *name, struct ObjWrapper *new_wrapper,
 //  Effects: `node` and `node->name` are freed.
 //  Returns: 0 in all cases.
 //  Notes: None.
-int free_registry_node(struct RegistryLL *node)
+int free_registry_node(struct RegistryLL* node)
 {
     free(node->name);
     free(node);

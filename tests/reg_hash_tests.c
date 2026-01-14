@@ -66,9 +66,9 @@ int main()
 
 int test_init_reg_table()
 {
-    const char *test_name = "test_init_reg_table()";
-    const char *lookup_name = "test";
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_init_reg_table()";
+    const char* lookup_name = "test";
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
     // bools equals1 for passing 0 for failing
     bool init_ok = false;
     bool lookup_ok = true;
@@ -107,10 +107,10 @@ int test_init_reg_table()
 
 int test_add_binding_different_object()
 {
-    const char *test_name = "test_add_binding";
-    struct ObjWrapper *wrapper_ptr = create_scalar(3.14);
-    const char *name1 = "A";
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_add_binding";
+    struct ObjWrapper* wrapper_ptr = create_scalar(3.14);
+    const char* name1 = "A";
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
     bool unbound_before_add = false;
     bool bound_after_add = false;
     bool add_ok = false;
@@ -148,11 +148,11 @@ int test_add_binding_different_object()
 
 int test_add_binding_same_object()
 {
-    const char *test_name = "test_add_binding_same_object";
-    struct ObjWrapper *wrapper_ptr = create_scalar(3.14);
-    const char *name1 = "A";
-    const char *name2 = "B";
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_add_binding_same_object";
+    struct ObjWrapper* wrapper_ptr = create_scalar(3.14);
+    const char* name1 = "A";
+    const char* name2 = "B";
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
     bool init_ok = false;
     bool unbound_before_add = false;
     bool bound_after_add1 = false;
@@ -203,10 +203,10 @@ int test_add_binding_same_object()
 
 int test_add_binding_same_name_noop()
 {
-    const char *test_name = "test_add_binding_same_name_noop";
-    struct ObjWrapper *wrapper_ptr = create_scalar(3.14);
-    const char *name1 = "A";
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_add_binding_same_name_noop";
+    struct ObjWrapper* wrapper_ptr = create_scalar(3.14);
+    const char* name1 = "A";
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
     bool init_ok = false;
     bool unbound_before_add = false;
     bool bound_after_add1 = false;
@@ -257,11 +257,11 @@ int test_add_binding_same_name_noop()
 
 int test_remove_then_rebind_new_name()
 {
-    const char *test_name = "test_remove_then_rebind_new_name";
-    struct ObjWrapper *wrapper_ptr = create_scalar(3.14);
-    const char *name1 = "A";
-    const char *name2 = "B";
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_remove_then_rebind_new_name";
+    struct ObjWrapper* wrapper_ptr = create_scalar(3.14);
+    const char* name1 = "A";
+    const char* name2 = "B";
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
     bool init_ok = false;
     bool unbound_before_add1 = false;
     bool add1_ok = false;
@@ -314,11 +314,11 @@ int test_remove_then_rebind_new_name()
 
 int test_add_binding_overwrite_different_object()
 {
-    const char *test_name = "test_add_binding_overwrite_different_object";
-    const char *name1 = "A";
-    struct ObjWrapper *wrapper_ptr1 = create_scalar(3.14);
-    struct ObjWrapper *wrapper_ptr2 = create_scalar(9.81);
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_add_binding_overwrite_different_object";
+    const char* name1 = "A";
+    struct ObjWrapper* wrapper_ptr1 = create_scalar(3.14);
+    struct ObjWrapper* wrapper_ptr2 = create_scalar(9.81);
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
 
     bool init_ok = false;
     bool unbound_before_add1 = false;
@@ -356,8 +356,8 @@ int test_add_binding_overwrite_different_object()
 
     destroy_reg_table(reg_table);
 
-    if (init_ok && unbound_before_add1 && add1_ok && bound_obj1_after_add1 &&
-        add2_ok && bound_obj2_after_add2)
+    if (init_ok && unbound_before_add1 && add1_ok && bound_obj1_after_add1 && add2_ok &&
+        bound_obj2_after_add2)
     {
         printf("%s PASSED.\n%s\n", test_name, DELIM);
         return 0;
@@ -368,10 +368,10 @@ int test_add_binding_overwrite_different_object()
 
 int test_remove_existing_binding()
 {
-    const char *test_name = "test_remove_existing_binding";
-    const char *name1 = "A";
-    struct ObjWrapper *wrapper_ptr = create_scalar(3.14);
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_remove_existing_binding";
+    const char* name1 = "A";
+    struct ObjWrapper* wrapper_ptr = create_scalar(3.14);
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
 
     bool init_ok = false;
     bool unbound_before_add = false;
@@ -408,8 +408,8 @@ int test_remove_existing_binding()
 
     destroy_reg_table(reg_table);
 
-    if (init_ok && unbound_before_add && add_ok && bound_after_add &&
-        remove_found_ok && unbound_after_remove)
+    if (init_ok && unbound_before_add && add_ok && bound_after_add && remove_found_ok &&
+        unbound_after_remove)
     {
         printf("%s PASSED.\n%s\n", test_name, DELIM);
         return 0;
@@ -420,11 +420,11 @@ int test_remove_existing_binding()
 
 int test_remove_nonexistent_binding()
 {
-    const char *test_name = "test_remove_nonexistent_binding";
-    const char *name1 = "A";
-    const char *name2 = "B";
-    struct ObjWrapper *wrapper_ptr = create_scalar(3.14);
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_remove_nonexistent_binding";
+    const char* name1 = "A";
+    const char* name2 = "B";
+    struct ObjWrapper* wrapper_ptr = create_scalar(3.14);
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
 
     bool init_ok = false;
     bool unbound_before_add = false;
@@ -452,14 +452,11 @@ int test_remove_nonexistent_binding()
 
         remove_nonexistent_name2_ok = (remove_binding(name2, reg_table) == 1);
         if (!remove_nonexistent_name2_ok)
-            printf("%s FAILED on remove_nonexistent_name2_ok.\n%s\n", test_name,
-                   DELIM);
+            printf("%s FAILED on remove_nonexistent_name2_ok.\n%s\n", test_name, DELIM);
 
-        name1_still_bound_after_remove_name2 =
-            (lookup_binding(name1, reg_table) == wrapper_ptr);
+        name1_still_bound_after_remove_name2 = (lookup_binding(name1, reg_table) == wrapper_ptr);
         if (!name1_still_bound_after_remove_name2)
-            printf("%s FAILED on name1_still_bound_after_remove_name2.\n%s\n",
-                   test_name, DELIM);
+            printf("%s FAILED on name1_still_bound_after_remove_name2.\n%s\n", test_name, DELIM);
     }
 
     destroy_reg_table(reg_table);
@@ -476,12 +473,12 @@ int test_remove_nonexistent_binding()
 
 int test_remove_binding_invalid_name()
 {
-    const char *test_name = "test_remove_binding_invalid_name";
-    const char *name1 = "A";
-    const char *name_null = NULL;
-    const char *name_empty = "";
-    struct ObjWrapper *wrapper_ptr = create_scalar(3.14);
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_remove_binding_invalid_name";
+    const char* name1 = "A";
+    const char* name_null = NULL;
+    const char* name_empty = "";
+    struct ObjWrapper* wrapper_ptr = create_scalar(3.14);
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
 
     bool init_ok = false;
     bool add_ok = false;
@@ -527,8 +524,8 @@ int test_remove_binding_invalid_name()
 
 int test_remove_binding_invalid_table()
 {
-    const char *test_name = "test_remove_binding_invalid_table";
-    struct RegistryHash *null_table = NULL;
+    const char* test_name = "test_remove_binding_invalid_table";
+    struct RegistryHash* null_table = NULL;
 
     bool remove_null_table_returns_3 = false;
 
@@ -549,15 +546,14 @@ int test_remove_binding_invalid_table()
 
 int test_destroy_reg_table_null_noop()
 {
-    const char *test_name = "test_destroy_reg_table_null_noop";
-    struct RegistryHash *null_table = NULL;
+    const char* test_name = "test_destroy_reg_table_null_noop";
+    struct RegistryHash* null_table = NULL;
 
     bool destroy_null_table_returns_zero = false;
 
     destroy_null_table_returns_zero = (destroy_reg_table(null_table) == 0);
     if (!destroy_null_table_returns_zero)
-        printf("%s FAILED on destroy_null_table_returns_zero.\n%s\n", test_name,
-               DELIM);
+        printf("%s FAILED on destroy_null_table_returns_zero.\n%s\n", test_name, DELIM);
 
     if (destroy_null_table_returns_zero)
     {
@@ -572,11 +568,11 @@ int test_destroy_reg_table_null_noop()
 
 int test_destroy_reg_table_nonempty_returns_0()
 {
-    const char *test_name = "test_destroy_reg_table_nonempty_returns_0";
-    const char *name1 = "A";
-    const char *name2 = "B";
-    struct ObjWrapper *wrapper_ptr = create_scalar(3.14);
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_destroy_reg_table_nonempty_returns_0";
+    const char* name1 = "A";
+    const char* name2 = "B";
+    struct ObjWrapper* wrapper_ptr = create_scalar(3.14);
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
 
     bool init_ok = false;
     bool name1_unbound_before_add1 = false;
@@ -621,13 +617,12 @@ int test_destroy_reg_table_nonempty_returns_0()
 
         destroy_nonempty_returns_0 = (destroy_reg_table(reg_table) == 0);
         if (!destroy_nonempty_returns_0)
-            printf("%s FAILED on destroy_nonempty_returns_0.\n%s\n", test_name,
-                   DELIM);
+            printf("%s FAILED on destroy_nonempty_returns_0.\n%s\n", test_name, DELIM);
     }
 
-    if (init_ok && name1_unbound_before_add1 && add1_ok &&
-        name1_bound_after_add1 && name2_unbound_before_add2 && add2_ok &&
-        name2_bound_after_add2 && destroy_nonempty_returns_0)
+    if (init_ok && name1_unbound_before_add1 && add1_ok && name1_bound_after_add1 &&
+        name2_unbound_before_add2 && add2_ok && name2_bound_after_add2 &&
+        destroy_nonempty_returns_0)
     {
         printf("%s PASSED.\n%s\n", test_name, DELIM);
         return 0;
@@ -640,11 +635,11 @@ int test_destroy_reg_table_nonempty_returns_0()
 
 int test_lookup_existing_binding()
 {
-    const char *test_name = "test_lookup_existing_binding";
-    const char *name1 = "A";
-    const char *name2 = "B";
-    struct ObjWrapper *wrapper_ptr = create_scalar(3.14);
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_lookup_existing_binding";
+    const char* name1 = "A";
+    const char* name2 = "B";
+    struct ObjWrapper* wrapper_ptr = create_scalar(3.14);
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
 
     bool init_ok = false;
     bool name1_unbound_before_add1 = false;
@@ -692,11 +687,9 @@ int test_lookup_existing_binding()
         if (!name1_second_lookup_ok)
             printf("%s FAILED on name1_second_lookup_ok.\n%s\n", test_name, DELIM);
 
-        name2_bound_after_name1_lookup =
-            (lookup_binding(name2, reg_table) == wrapper_ptr);
+        name2_bound_after_name1_lookup = (lookup_binding(name2, reg_table) == wrapper_ptr);
         if (!name2_bound_after_name1_lookup)
-            printf("%s FAILED on name2_bound_after_name1_lookup.\n%s\n", test_name,
-                   DELIM);
+            printf("%s FAILED on name2_bound_after_name1_lookup.\n%s\n", test_name, DELIM);
 
         remove_after_lookup_ok = (remove_binding(name1, reg_table) == 0);
         if (!remove_after_lookup_ok)
@@ -704,22 +697,19 @@ int test_lookup_existing_binding()
 
         name1_removed_after_lookup = (lookup_binding(name1, reg_table) == NULL);
         if (!name1_removed_after_lookup)
-            printf("%s FAILED on name1_removed_after_lookup.\n%s\n", test_name,
-                   DELIM);
+            printf("%s FAILED on name1_removed_after_lookup.\n%s\n", test_name, DELIM);
 
-        name2_bound_after_remove =
-            (lookup_binding(name2, reg_table) == wrapper_ptr);
+        name2_bound_after_remove = (lookup_binding(name2, reg_table) == wrapper_ptr);
         if (!name2_bound_after_remove)
             printf("%s FAILED on name2_bound_after_remove.\n%s\n", test_name, DELIM);
     }
 
     destroy_reg_table(reg_table);
 
-    if (init_ok && name1_unbound_before_add1 && add1_ok &&
-        name1_bound_after_add1 && name2_unbound_before_add2 && add2_ok &&
-        name2_bound_after_add2 && name1_second_lookup_ok &&
-        name2_bound_after_name1_lookup && remove_after_lookup_ok &&
-        name1_removed_after_lookup && name2_bound_after_remove)
+    if (init_ok && name1_unbound_before_add1 && add1_ok && name1_bound_after_add1 &&
+        name2_unbound_before_add2 && add2_ok && name2_bound_after_add2 && name1_second_lookup_ok &&
+        name2_bound_after_name1_lookup && remove_after_lookup_ok && name1_removed_after_lookup &&
+        name2_bound_after_remove)
     {
         printf("%s PASSED.\n%s\n", test_name, DELIM);
         return 0;
@@ -732,12 +722,12 @@ int test_lookup_existing_binding()
 
 int test_lookup_binding_invalid_name()
 {
-    const char *test_name = "test_lookup_binding_invalid_name";
-    const char *name1 = "A";
-    const char *name_null = NULL;
-    const char *name_empty = "";
-    struct ObjWrapper *wrapper_ptr = create_scalar(3.14);
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_lookup_binding_invalid_name";
+    const char* name1 = "A";
+    const char* name_null = NULL;
+    const char* name_empty = "";
+    struct ObjWrapper* wrapper_ptr = create_scalar(3.14);
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
 
     bool init_ok = false;
     bool add_ok = false;
@@ -769,8 +759,8 @@ int test_lookup_binding_invalid_name()
 
     destroy_reg_table(reg_table);
 
-    if (init_ok && add_ok && lookup_null_returns_null &&
-        lookup_empty_returns_null && good_name_still_bound)
+    if (init_ok && add_ok && lookup_null_returns_null && lookup_empty_returns_null &&
+        good_name_still_bound)
     {
         printf("%s PASSED.\n%s\n", test_name, DELIM);
         return 0;
@@ -783,15 +773,14 @@ int test_lookup_binding_invalid_name()
 
 int test_lookup_binding_invalid_table()
 {
-    const char *test_name = "test_lookup_binding_invalid_table";
-    struct RegistryHash *null_table = NULL;
+    const char* test_name = "test_lookup_binding_invalid_table";
+    struct RegistryHash* null_table = NULL;
 
     bool lookup_null_table_returns_null = false;
 
     lookup_null_table_returns_null = (lookup_binding("A", null_table) == NULL);
     if (!lookup_null_table_returns_null)
-        printf("%s FAILED on lookup_null_table_returns_null.\n%s\n", test_name,
-               DELIM);
+        printf("%s FAILED on lookup_null_table_returns_null.\n%s\n", test_name, DELIM);
 
     if (lookup_null_table_returns_null)
     {
@@ -806,12 +795,12 @@ int test_lookup_binding_invalid_table()
 
 int test_list_bindings()
 {
-    const char *test_name = "test_list_bindings";
-    const char *name1 = "A";
-    struct ObjWrapper *wrapper_ptr = create_scalar(3.14);
-    struct RegistryHash *reg_table = init_reg_table(TABLE_SIZE);
-    struct RegistryHash *null_table = NULL;
-    struct RegistryHash *empty_table = init_reg_table(TABLE_SIZE);
+    const char* test_name = "test_list_bindings";
+    const char* name1 = "A";
+    struct ObjWrapper* wrapper_ptr = create_scalar(3.14);
+    struct RegistryHash* reg_table = init_reg_table(TABLE_SIZE);
+    struct RegistryHash* null_table = NULL;
+    struct RegistryHash* empty_table = init_reg_table(TABLE_SIZE);
 
     bool init_ok = false;
     bool unbound_before_add = false;
@@ -842,37 +831,31 @@ int test_list_bindings()
 
         list_bindings_existing_table_returns_0 = (list_bindings(reg_table) == 0);
         if (!list_bindings_existing_table_returns_0)
-            printf("%s FAILED on list_bindings_existing_table_returns_0.\n%s\n",
-                   test_name, DELIM);
+            printf("%s FAILED on list_bindings_existing_table_returns_0.\n%s\n", test_name, DELIM);
 
-        bound_after_list_bindings =
-            (lookup_binding(name1, reg_table) == wrapper_ptr);
+        bound_after_list_bindings = (lookup_binding(name1, reg_table) == wrapper_ptr);
         if (!bound_after_list_bindings)
             printf("%s FAILED on bound_after_list_bindings.\n%s\n", test_name, DELIM);
 
         list_bindings_empty_table_returns_0 = (list_bindings(empty_table) == 0);
         if (!list_bindings_empty_table_returns_0)
-            printf("%s FAILED list_bindings_empty_table_returns_0.\n%s\n", test_name,
-                   DELIM);
+            printf("%s FAILED list_bindings_empty_table_returns_0.\n%s\n", test_name, DELIM);
 
         list_bindings_null_table_returns_1 = (list_bindings(null_table) == 1);
         if (!list_bindings_null_table_returns_1)
-            printf("%s FAILED on list_bindings_null_table_returns_1.\n%s\n",
-                   test_name, DELIM);
+            printf("%s FAILED on list_bindings_null_table_returns_1.\n%s\n", test_name, DELIM);
 
-        bound_after_list_null_table =
-            (lookup_binding(name1, reg_table) == wrapper_ptr);
+        bound_after_list_null_table = (lookup_binding(name1, reg_table) == wrapper_ptr);
         if (!bound_after_list_null_table)
-            printf("%s FAILED on bound_after_list_null_table.\n%s\n", test_name,
-                   DELIM);
+            printf("%s FAILED on bound_after_list_null_table.\n%s\n", test_name, DELIM);
     }
 
     destroy_reg_table(reg_table);
 
     if (init_ok && unbound_before_add && add_ok && bound_after_add &&
         list_bindings_existing_table_returns_0 && bound_after_list_bindings &&
-        list_bindings_empty_table_returns_0 &&
-        list_bindings_null_table_returns_1 && bound_after_list_null_table)
+        list_bindings_empty_table_returns_0 && list_bindings_null_table_returns_1 &&
+        bound_after_list_null_table)
     {
         printf("%s PASSED.\n%s\n", test_name, DELIM);
         return 0;
