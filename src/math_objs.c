@@ -268,12 +268,21 @@ int decref_obj(struct ObjWrapper *wrapper)
     return 0;
 }
 
+//  Pre conditions:
+//    1.  wrapper != NULL.
+//  Post conditions: None.
 enum ObjType get_obj_type(const struct ObjWrapper *wrapper)
 {
-    assert(wrapper); // internal invariant violation
+    if (!wrapper)
+        return OBJ_NONE; // wrapper is NULL
     return wrapper->type;
 }
 
+//  Pre conditions: None.
+//  Post conditions: None.
+//  Asserts invariant: obj->ref_count == 1 for all objects before teardown.
+//  Asserts invariant: obj_list.count == 0 after teardown.
+//  Asserts invariant: obj_list.head == NULL after teardown.
 int destroy_obj_list()
 {
     while (obj_list.head)
@@ -293,11 +302,18 @@ int destroy_obj_list()
  * Public debug functions
  * ============================================================================
  */
-
+//  Pre conditions:
+//   1. wrapper != NULL.
+//  post conditions: None.
 size_t debug_get_obj_refcount(const struct ObjWrapper *wrapper)
 {
-    assert(wrapper);
+#ifdef NDEBUG
+    return -1;
+#else
+    if (!wrapper)
+        return -1; // invalid input
     return wrapper->ref_count;
+#endif
 }
 #pragma endregion
 

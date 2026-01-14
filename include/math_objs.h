@@ -11,6 +11,7 @@
  */
 enum ObjType
 {
+    OBJ_NONE = -1,
     OBJ_SCALAR,
     OBJ_VECTOR,
     OBJ_MATRIX,
@@ -96,8 +97,10 @@ struct ObjWrapper *create_scalar(double value);
   Return `type` field for passed wrapper.
 @param wrapper: Object wrapper for type inquiry.
 @return enum
-  ObjType: In all cases.
-@pre None.
+  OBJ_MATRIX/VECTOR/SCALAR: On success.
+  OBJ_NONE: On missing wrapper.
+@pre
+    wrapper != NULL.
 @post None.
 @note Used in debug function `list_bindings()`
 @warning
@@ -144,11 +147,8 @@ int incref_obj(struct ObjWrapper *wrapper);
   Perform final teardown of `obj_list`.
 @return
   0: In all cases.
-@pre
-  `object->ref_count` == 1 for all existing objects.
-@post
-  `obj_list.count` == 0.
-  `obj_list.head` == NULL.
+@pre: None.
+@post: None.
 @note Used exclusively for program/session shutdown.
 @warning None.
  */
@@ -164,7 +164,8 @@ int destroy_obj_list();
   Return the `ref_count` field assocated with `wrapper`.
 @param wrapper: Object to query for `ref_count`.
 @return
-  size_t: In all cases.
+  size_t:   On success.
+  -1:       Invalid input
 @pre
   wrapper != NULL.
 @post None.

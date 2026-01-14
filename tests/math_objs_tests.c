@@ -32,6 +32,12 @@ int test_decref_obj_01();
 int test_incref_obj_00();
 int test_incref_obj_01();
 
+int test_get_obj_type_00();
+int test_get_obj_type_01();
+
+int test_debug_get_obj_refcount_00();
+int test_debug_get_obj_refcount_01();
+
 /* ============================================================================
  * Helper function prototypes
  * ============================================================================
@@ -65,6 +71,12 @@ int main()
 
     assert(test_incref_obj_00() == 0);
     assert(test_incref_obj_01() == 0);
+
+    assert(test_get_obj_type_00() == 0);
+    assert(test_get_obj_type_01() == 0);
+
+    assert(test_debug_get_obj_refcount_00() == 0);
+    assert(test_debug_get_obj_refcount_01() == 0);
 
     return 0;
 }
@@ -677,6 +689,130 @@ int test_incref_obj_01()
     if (incref_obj_rtn_1 == false)
     {
         printf("%s FAILED on incref_obj_rtn_1.\n%s\n", test_name, DELIM);
+        return 1;
+    }
+
+    printf("%s PASSED.\n%s\n", test_name, DELIM);
+    return 0;
+}
+#pragma endregion
+
+#pragma region get_obj_type() tests
+/* ============================================================================
+ * get_obj_type() tests
+ * ============================================================================
+ */
+int test_get_obj_type_00()
+{
+    // test for valid input
+
+    const char *test_name = "test_get_obj_type_00";
+
+    bool create_obj_OK = false;
+    bool get_obj_type_OK = false;
+
+    struct ObjWrapper *new_scalar = create_scalar(3.14);
+
+    create_obj_OK = (new_scalar != NULL);
+    if (create_obj_OK == false)
+    {
+        printf("%s FAILED on create_obj_OK.\n%s\n", test_name, DELIM);
+        return 1;
+    }
+
+    get_obj_type_OK = (get_obj_type(new_scalar) == OBJ_SCALAR);
+    if (get_obj_type_OK == false)
+    {
+        printf("%s FAILED on get_obj_type_OK.\n%s\n", test_name, DELIM);
+        return 1;
+    }
+
+    decref_obj(new_scalar); // relaese the object
+
+    printf("%s PASSED.\n%s\n", test_name, DELIM);
+    return 0;
+}
+
+int test_get_obj_type_01()
+{
+    //  Violates condition:   1.  wrapper != NULL.
+
+    const char *test_name = "test_get_obj_type_01";
+
+    bool rtn_OBJ_NONE = false;
+
+    struct ObjWrapper *null_wrapper = NULL;
+
+    rtn_OBJ_NONE = (get_obj_type(null_wrapper) == OBJ_NONE);
+    if (rtn_OBJ_NONE == false)
+    {
+        printf("%s FAILED on rtn_OBJ_NONE.\n%s\n", test_name, DELIM);
+        return 1;
+    }
+
+    printf("%s PASSED.\n%s\n", test_name, DELIM);
+    return 0;
+}
+#pragma endregion
+
+#pragma region destroy_obj_list() tests
+/* ============================================================================
+ * destroy_obj_list() tests
+ * ============================================================================
+ */
+
+// None.
+#pragma endregion
+
+#pragma region debug_get_obj_refcount() tests
+/* ============================================================================
+ * debug_get_obj_refcount() tests
+ * ============================================================================
+ */
+int test_debug_get_obj_refcount_00()
+{
+    // test for valid input
+
+    const char *test_name = "test_debug_get_obj_refcount_00";
+
+    bool create_obj_OK = false;
+    bool debug_get_obj_refcount_rtn_OK = false;
+
+    struct ObjWrapper *new_scalar = create_scalar(3.14);
+
+    create_obj_OK = (new_scalar != NULL);
+    if (create_obj_OK == false)
+    {
+        printf("%s FAILED on create_obj_OK.\n%s\n", test_name, DELIM);
+        return 1;
+    }
+
+    debug_get_obj_refcount_rtn_OK = (debug_get_obj_refcount(new_scalar) == 1);
+    if (debug_get_obj_refcount_rtn_OK == false)
+    {
+        printf("%s FAILED on debug_get_obj_refcount_rtn_OK.\n%s\n", test_name, DELIM);
+        return 1;
+    }
+
+    decref_obj(new_scalar);
+    printf("%s PASSED.\n%s\n", test_name, DELIM);
+    return 0;
+}
+
+int test_debug_get_obj_refcount_01()
+{
+    // Violates condition:     1. wrapper != NULL.
+
+    const char *test_name = "test_debug_get_obj_refcount_01";
+
+    bool rtns_minus_1 = false;
+
+    struct ObjWrapper *null_wrapper = NULL;
+
+    rtns_minus_1 = (debug_get_obj_refcount(null_wrapper) == -1);
+    if (rtns_minus_1 == false)
+    {
+        printf("%s FAILED on rtns_minus_1.\n%s\n", test_name, DELIM);
         return 1;
     }
 
