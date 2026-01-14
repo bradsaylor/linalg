@@ -1,11 +1,13 @@
 #ifndef LOGS_H
 #define LOGS_H
 
+#include <stdio.h>
+
 #define LOG_OUT(log_type, format, ...)                                                             \
     do                                                                                             \
     {                                                                                              \
         log_out(log_type, __FILE__, __LINE__, __func__, format, ##__VA_ARGS__);                    \
-    }; while (0)
+    } while (0)
 
 typedef enum
 {
@@ -16,8 +18,6 @@ typedef enum
     LOG_ERROR,
     LOG_NONE
 } LogType;
-
-extern LogType log_level;
 
 int log_out(LogType log_type, const char* file, const int line, const char* func,
             const char* format, ...);
