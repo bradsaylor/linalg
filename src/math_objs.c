@@ -1,4 +1,5 @@
 #include "../include/math_objs.h"
+#include "../include/logs.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -53,14 +54,14 @@ static struct ObjLL obj_list;
  * Private function prototypes
  * ============================================================================
  */
-int destroy_matrix(struct Matrix* matrix);
-int destroy_vector(struct Vector* vector);
-int destroy_scalar(struct Scalar* scalar);
-int destroy_wrapper(struct ObjWrapper* wrapper);
-int add_object(struct ObjWrapper* object);
-int remove_object(struct ObjWrapper* object);
-int destroy_obj(struct ObjWrapper* wrapper);
-struct ObjLLNode* find_node(struct ObjWrapper* wrapper, struct ObjLLNode* prev_node);
+static int destroy_matrix(struct Matrix* matrix);
+static int destroy_vector(struct Vector* vector);
+static int destroy_scalar(struct Scalar* scalar);
+static int destroy_wrapper(struct ObjWrapper* wrapper);
+static int add_object(struct ObjWrapper* object);
+static int remove_object(struct ObjWrapper* object);
+static int destroy_obj(struct ObjWrapper* wrapper);
+static struct ObjLLNode* find_node(struct ObjWrapper* wrapper, struct ObjLLNode* prev_node);
 #pragma endregion
 
 #pragma region Public API
@@ -92,11 +93,17 @@ struct ObjWrapper* create_matrix(struct List elements, size_t num_rows, size_t n
     // Allocate matrix object and wrapper
     struct Matrix* new_matrix = malloc(sizeof(struct Matrix));
     if (!new_matrix)
+    {
+        LOG_OUT(LOG_ERROR, "Failed to malloc %zu bytes for new matrix (%zuX%zu).",
+                sizeof(struct Matrix), num_rows, num_cols);
         return NULL;
+    }
 
     struct ObjWrapper* new_wrapper = malloc(sizeof(struct ObjWrapper));
     if (!new_wrapper)
     {
+        LOG_OUT(LOG_ERROR, "Failed to malloc %zu bytes for new wrapper (matrix %zuX%zu).",
+                sizeof(struct ObjWrapper), num_rows, num_cols);
         free(new_matrix);
         return NULL;
     }
@@ -113,6 +120,9 @@ struct ObjWrapper* create_matrix(struct List elements, size_t num_rows, size_t n
     int add_obj_ret = add_object(new_wrapper);
     if (add_obj_ret)
     {
+        LOG_OUT(LOG_ERROR,
+                "add_object() failed: wrapper=%p obj=%p type=MATRIX dims=%zuX%zu ret=%d.",
+                new_wrapper, new_wrapper->obj, num_rows, num_cols, add_obj_ret);
         free(new_matrix);
         free(new_wrapper);
         return NULL;
@@ -121,6 +131,8 @@ struct ObjWrapper* create_matrix(struct List elements, size_t num_rows, size_t n
     // Pass ownership of elements.list to new_matrix
     new_matrix->elements = elements;
 
+    LOG_OUT(LOG_DEBUG, "create_matrix() succeeded: wrapper=%p obj=%p type=MATRIX dims=%zuX%zu.",
+            new_wrapper, new_wrapper->obj, num_rows, num_cols);
     return new_wrapper;
 }
 
@@ -141,11 +153,17 @@ struct ObjWrapper* create_vector(struct List elements)
 
     struct Vector* new_vector = malloc(sizeof(struct Vector));
     if (!new_vector)
+    {
+        LOG_OUT(LOG_ERROR, "Failed to malloc %zu bytes for new vector dim=%zu.",
+                sizeof(struct Vector), elements.size);
         return NULL;
+    }
 
     struct ObjWrapper* new_wrapper = malloc(sizeof(struct ObjWrapper));
     if (!new_wrapper)
     {
+        LOG_OUT(LOG_ERROR, "Failed to malloc %zu bytes for new wrapper (vector dim=%zu).",
+                sizeof(struct ObjWrapper), elements.size);
         free(new_vector);
         return NULL;
     }
@@ -157,6 +175,8 @@ struct ObjWrapper* create_vector(struct List elements)
     int add_obj_ret = add_object(new_wrapper);
     if (add_obj_ret)
     { // failed add_object()
+        LOG_OUT(LOG_ERROR, "add_object() failed: wrapper=%p obj=%p type=VECTOR dim=%zu ret=%d.",
+                new_wrapper, new_wrapper->obj, elements.size, add_obj_ret);
         free(new_vector);
         free(new_wrapper);
         return NULL;
@@ -165,6 +185,8 @@ struct ObjWrapper* create_vector(struct List elements)
     // Pass ownership of elements.list to new_vector
     new_vector->elements = elements;
 
+    LOG_OUT(LOG_DEBUG, "create_vector() succeeded: wrapper=%p obj=%p type=VECTOR dim=%zu.",
+            new_wrapper, new_wrapper->obj, elements.size);
     return new_wrapper;
 }
 
@@ -174,10 +196,16 @@ struct ObjWrapper* create_scalar(double value)
 {
     struct Scalar* new_scalar = malloc(sizeof(struct Scalar));
     if (!new_scalar)
+    {
+        LOG_OUT(LOG_ERROR, "Failed to malloc %zu bytes for new scalar.", sizeof(struct Scalar));
         return NULL;
+    }
+
     struct ObjWrapper* new_wrapper = malloc(sizeof(struct ObjWrapper));
     if (!new_wrapper)
     {
+        LOG_OUT(LOG_ERROR, "Failed to malloc %zu bytes for new wrapper (scalar).",
+                sizeof(struct ObjWrapper));
         free(new_scalar);
         return NULL;
     }
@@ -191,11 +219,15 @@ struct ObjWrapper* create_scalar(double value)
     int add_obj_ret = add_object(new_wrapper);
     if (add_obj_ret)
     { // failed add_object()
+        LOG_OUT(LOG_ERROR, "add_object() failed: wrapper=%p obj=%p type=SCALAR ret=%d.",
+                new_wrapper, new_wrapper->obj, add_obj_ret);
         free(new_scalar);
         free(new_wrapper);
         return NULL;
     }
 
+    LOG_OUT(LOG_DEBUG, "create_scalar() succeeded: wrapper=%p obj=%p type=SCALAR.", new_wrapper,
+            new_wrapper->obj);
     return new_wrapper;
 }
 
@@ -240,9 +272,16 @@ int incref_obj(struct ObjWrapper* wrapper)
     if (!wrapper)
         return 1; // caller error
     if (wrapper->ref_count == 0)
-        return 2; // internal error
+    {
+        LOG_OUT(LOG_ERROR, "incref_obj invariant violated: wrapper=%p obj=%p type=%d rc=%zu.",
+                wrapper, wrapper->obj, wrapper->type, wrapper->ref_count);
+        return 3; // internal error
+    }
 
+    size_t old_rc = wrapper->ref_count;
     wrapper->ref_count++;
+    LOG_OUT(LOG_DEBUG, "incref_obj: wrapper=%p obj=%p type=%d rc:%zu->%zu.", wrapper, wrapper->obj,
+            wrapper->type, old_rc, wrapper->ref_count);
     return 0;
 }
 
@@ -256,12 +295,24 @@ int decref_obj(struct ObjWrapper* wrapper)
 
     assert(wrapper->ref_count != 0);
     if (wrapper->ref_count == 0)
+    {
+        LOG_OUT(LOG_ERROR, "decref_obj invariant violated: wrapper=%p obj=%p type=%d rc=%zu.",
+                wrapper, wrapper->obj, wrapper->type, wrapper->ref_count);
         return 3; // internal error
+    }
 
+    size_t old_rc = wrapper->ref_count;
     wrapper->ref_count--;
-    if (wrapper->ref_count == 0)
+    if (wrapper->ref_count == 0) // destroy obj if ref_count -> 0
+    {
+        LOG_OUT(LOG_DEBUG, "decref_obj: wrapper=%p obj=%p type=%d rc:%zu->%zu (destroy).", wrapper,
+                wrapper->obj, wrapper->type, old_rc, wrapper->ref_count);
         destroy_obj(wrapper);
+        return 0;
+    }
 
+    LOG_OUT(LOG_DEBUG, "decref_obj: wrapper=%p obj=%p type=%d rc:%zu->%zu.", wrapper, wrapper->obj,
+            wrapper->type, old_rc, wrapper->ref_count);
     return 0;
 }
 
@@ -325,7 +376,7 @@ size_t debug_get_obj_refcount(const struct ObjWrapper* wrapper)
 //  Effects: `matrix` and `matrix->elements.list` freed.
 //  Returns: 0 in all cases.
 //  Notes: None.
-int destroy_matrix(struct Matrix* matrix)
+static int destroy_matrix(struct Matrix* matrix)
 {
     if (!matrix)
         return 0;
@@ -339,7 +390,7 @@ int destroy_matrix(struct Matrix* matrix)
 //  Effects: `vector` and `vector->elements.list` freed.
 //  Returns: 0 in all cases.
 //  Notes: None.
-int destroy_vector(struct Vector* vector)
+static int destroy_vector(struct Vector* vector)
 {
     if (!vector)
         return 0;
@@ -353,7 +404,7 @@ int destroy_vector(struct Vector* vector)
 //  Effects: `scalar` freed.
 //  Returns: 0 in all cases.
 //  Notes: None.
-int destroy_scalar(struct Scalar* scalar)
+static int destroy_scalar(struct Scalar* scalar)
 {
     if (!scalar)
         return 0;
@@ -366,7 +417,7 @@ int destroy_scalar(struct Scalar* scalar)
 //  Effects: `wrapper` freed.
 //  Returns: 0 in all cases.
 //  Notes: None.
-int destroy_wrapper(struct ObjWrapper* wrapper)
+static int destroy_wrapper(struct ObjWrapper* wrapper)
 {
     if (!wrapper)
         return 0;
@@ -383,7 +434,7 @@ int destroy_wrapper(struct ObjWrapper* wrapper)
 //    2: Allocation error.
 //    3: Internal invariance violation.
 //  Notes: Enforces invariant: one `obj_list` reference per object.
-int add_object(struct ObjWrapper* object)
+static int add_object(struct ObjWrapper* object)
 {
     // return immediately for invalid input
     if (!object)
@@ -422,7 +473,7 @@ int add_object(struct ObjWrapper* object)
 //  Notes:
 //    - Enforces invariant: Removal not allowed from empty `obj_list`.
 //    - Enforces invariant: `obj_list.head` must exist.
-int remove_object(struct ObjWrapper* object)
+static int remove_object(struct ObjWrapper* object)
 {
     if (!object)
         return 1; // caller error
@@ -464,7 +515,7 @@ int remove_object(struct ObjWrapper* object)
 //  Notes:
 //    `prev_node` populated if `wrapper` found and `wrapper` is not the first
 //    list element.
-struct ObjLLNode* find_node(struct ObjWrapper* wrapper, struct ObjLLNode* prev_node)
+static struct ObjLLNode* find_node(struct ObjWrapper* wrapper, struct ObjLLNode* prev_node)
 {
     struct ObjLLNode* search_node = obj_list.head;
     while (search_node)

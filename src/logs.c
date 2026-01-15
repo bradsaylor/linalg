@@ -2,10 +2,22 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 
 static LogType log_level = LOG_NONE;
 static FILE* log_sink = NULL;
+
+/* ============================================================================
+ * Private function prototypes
+ * ============================================================================
+ */
+static const char* basename_from_path(const char* path);
+
+/* ============================================================================
+ * Public API functions
+ * ============================================================================
+ */
 
 int log_out(LogType log_type, const char* file, const int line, const char* func,
             const char* format, ...)
@@ -54,7 +66,8 @@ int log_out(LogType log_type, const char* file, const int line, const char* func
     }
 
     // Final output
-    fprintf(log_sink, "[%s] [%s] [%s:%d %s] %s\n", time_str, type_str, file, line, func, user_msg);
+    fprintf(log_sink, "[%s] [%s] [%s:%d %s] %s\n", time_str, type_str, basename_from_path(file),
+            line, func, user_msg);
 
     return 0;
 }
@@ -75,4 +88,30 @@ int set_log_sink(FILE* new_sink)
         log_sink = stderr;
 
     return 0;
+}
+
+/* ============================================================================
+ * Private helper functions
+ * ============================================================================
+ */
+static const char* basename_from_path(const char* path)
+{
+    if (path == NULL) // no path provided
+        return "(null)";
+
+    const char* base_name_win = strrchr(path, '\\');
+    const char* base_name_unix = strrchr(path, '/');
+    const char* base_name = NULL;
+
+    if (base_name_unix == NULL && base_name_win == NULL) // no path delims
+        return path;
+
+    if (base_name_unix == NULL) // win delim only
+        base_name = base_name_win;
+    else if (base_name_win == NULL) // unix delim only
+        base_name = base_name_unix;
+    else // both delims (neither == NULL), pick the last one
+        base_name = (base_name_unix > base_name_win) ? base_name_unix : base_name_win;
+
+    return (base_name + 1); // return ptr to char after last delim
 }

@@ -56,17 +56,18 @@ struct RegistryHash
  * ============================================================================
  */
 
-unsigned int hash(const char* s); // from K&R 'C programming language'
-struct RegistryLL* find_node(struct RegistryLL** prev_node, struct RegistryHash* reg_table,
-                             const char* name, size_t index);
-char* copy_name(const char* name);
-int add_node(struct RegistryLL* new_node, struct RegistryLL** list_head);
-int remove_node(struct RegistryLL* node, struct RegistryLL* prev_node,
-                struct RegistryLL** list_head);
-int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjWrapper* old_wrapper);
-int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrapper,
-                            struct RegistryHash* reg_table, size_t index);
-int free_registry_node(struct RegistryLL* node);
+static unsigned int hash(const char* s); // from K&R 'C programming language'
+static struct RegistryLL* find_node(struct RegistryLL** prev_node, struct RegistryHash* reg_table,
+                                    const char* name, size_t index);
+static char* copy_name(const char* name);
+static int add_node(struct RegistryLL* new_node, struct RegistryLL** list_head);
+static int remove_node(struct RegistryLL* node, struct RegistryLL* prev_node,
+                       struct RegistryLL** list_head);
+static int add_binding_already_bound(struct ObjWrapper* new_wrapper,
+                                     struct ObjWrapper* old_wrapper);
+static int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrapper,
+                                   struct RegistryHash* reg_table, size_t index);
+static int free_registry_node(struct RegistryLL* node);
 #pragma endregion
 
 #pragma region Public API
@@ -327,7 +328,7 @@ static int remove_node(struct RegistryLL* node, struct RegistryLL* prev_node,
 //    0: On success.
 //    5: On failed incref_obj()
 //  Notes: Failed decref_obj() is an invariant violation
-int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjWrapper* old_wrapper)
+static int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjWrapper* old_wrapper)
 {
     if (new_wrapper == old_wrapper)
     { // already bound to object
@@ -362,7 +363,7 @@ int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjWrapper*
 //    2: Allocation failure.
 //    5: Incref_obj() failure.
 //  Notes: None.
-int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrapper,
+static int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrapper,
                             struct RegistryHash* reg_table, size_t index)
 {
     char* new_name = copy_name(name);
@@ -410,7 +411,7 @@ int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrapper,
 //  Effects: `node` and `node->name` are freed.
 //  Returns: 0 in all cases.
 //  Notes: None.
-int free_registry_node(struct RegistryLL* node)
+static int free_registry_node(struct RegistryLL* node)
 {
     free(node->name);
     free(node);
