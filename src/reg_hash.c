@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../include/logs.h"
 #include "../include/math_objs.h"
 
 #pragma region Head Comment
@@ -82,19 +83,35 @@ static int free_registry_node(struct RegistryLL* node);
 // Allocation failures return NULL
 struct RegistryHash* init_reg_table(size_t table_size)
 {
+    if (table_size == 0)
+        return NULL; // caller error
+
+    // allocate for table
     struct RegistryHash* reg_table = malloc(sizeof(struct RegistryHash));
     if (!reg_table)
+    {
+        LOG_OUT(LOG_ERROR, "failed to allocate %zu bytes for reg table of size %zu.",
+                sizeof(struct RegistryHash), table_size);
         return NULL;
+    }
+
+    // allocate for table buckets
     // calloc -> initialize to zero
     struct RegistryLL** table = calloc(table_size, sizeof(struct RegistryLL*));
     if (!table)
     {
+        LOG_OUT(LOG_ERROR,
+                "failed to allocate %zu bytes for table buckets for reg_table of size %zu.",
+                table_size * sizeof(struct RegistryLL*), table_size);
         free(reg_table);
         return NULL;
     }
+
+    // populate reg_table struct on success
     reg_table->table = table;
     reg_table->size = table_size;
 
+    LOG_OUT(LOG_DEBUG, "success: reg_table=%p size=%zu.", reg_table, reg_table->size);
     return reg_table;
 }
 
@@ -364,7 +381,7 @@ static int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjW
 //    5: Incref_obj() failure.
 //  Notes: None.
 static int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrapper,
-                            struct RegistryHash* reg_table, size_t index)
+                                   struct RegistryHash* reg_table, size_t index)
 {
     char* new_name = copy_name(name);
     if (!new_name)

@@ -2,6 +2,7 @@
 #include "../include/logs.h"
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 #pragma region Local Definitions
@@ -58,8 +59,8 @@ static int destroy_matrix(struct Matrix* matrix);
 static int destroy_vector(struct Vector* vector);
 static int destroy_scalar(struct Scalar* scalar);
 static int destroy_wrapper(struct ObjWrapper* wrapper);
-static int add_object(struct ObjWrapper* object);
-static int remove_object(struct ObjWrapper* object);
+static int add_obj(struct ObjWrapper* object);
+static int remove_obj(struct ObjWrapper* object);
 static int destroy_obj(struct ObjWrapper* wrapper);
 static struct ObjLLNode* find_node(struct ObjWrapper* wrapper, struct ObjLLNode* prev_node);
 #pragma endregion
@@ -117,11 +118,11 @@ struct ObjWrapper* create_matrix(struct List elements, size_t num_rows, size_t n
     new_wrapper->ref_count = 1;
 
     // Add wrapper to object list
-    int add_obj_ret = add_object(new_wrapper);
+    int add_obj_ret = add_obj(new_wrapper);
     if (add_obj_ret)
     {
         LOG_OUT(LOG_ERROR,
-                "add_object() failed: wrapper=%p obj=%p type=MATRIX dims=%zuX%zu ret=%d.",
+                "add_obj() failed: wrapper=%p obj=%p type=MATRIX dims=%zuX%zu ret=%d.",
                 new_wrapper, new_wrapper->obj, num_rows, num_cols, add_obj_ret);
         free(new_matrix);
         free(new_wrapper);
@@ -131,8 +132,8 @@ struct ObjWrapper* create_matrix(struct List elements, size_t num_rows, size_t n
     // Pass ownership of elements.list to new_matrix
     new_matrix->elements = elements;
 
-    LOG_OUT(LOG_DEBUG, "create_matrix() succeeded: wrapper=%p obj=%p type=MATRIX dims=%zuX%zu.",
-            new_wrapper, new_wrapper->obj, num_rows, num_cols);
+    LOG_OUT(LOG_DEBUG, "succeeded: wrapper=%p obj=%p type=MATRIX dims=%zuX%zu.", new_wrapper,
+            new_wrapper->obj, num_rows, num_cols);
     return new_wrapper;
 }
 
@@ -172,10 +173,10 @@ struct ObjWrapper* create_vector(struct List elements)
     new_wrapper->type = OBJ_VECTOR;
     new_wrapper->ref_count = 1;
 
-    int add_obj_ret = add_object(new_wrapper);
+    int add_obj_ret = add_obj(new_wrapper);
     if (add_obj_ret)
-    { // failed add_object()
-        LOG_OUT(LOG_ERROR, "add_object() failed: wrapper=%p obj=%p type=VECTOR dim=%zu ret=%d.",
+    { // failed add_obj()
+        LOG_OUT(LOG_ERROR, "add_obj() failed: wrapper=%p obj=%p type=VECTOR dim=%zu ret=%d.",
                 new_wrapper, new_wrapper->obj, elements.size, add_obj_ret);
         free(new_vector);
         free(new_wrapper);
@@ -185,8 +186,8 @@ struct ObjWrapper* create_vector(struct List elements)
     // Pass ownership of elements.list to new_vector
     new_vector->elements = elements;
 
-    LOG_OUT(LOG_DEBUG, "create_vector() succeeded: wrapper=%p obj=%p type=VECTOR dim=%zu.",
-            new_wrapper, new_wrapper->obj, elements.size);
+    LOG_OUT(LOG_DEBUG, "succeeded: wrapper=%p obj=%p type=VECTOR dim=%zu.", new_wrapper,
+            new_wrapper->obj, elements.size);
     return new_wrapper;
 }
 
@@ -216,18 +217,17 @@ struct ObjWrapper* create_scalar(double value)
     new_wrapper->type = OBJ_SCALAR;
     new_wrapper->ref_count = 1;
 
-    int add_obj_ret = add_object(new_wrapper);
+    int add_obj_ret = add_obj(new_wrapper);
     if (add_obj_ret)
-    { // failed add_object()
-        LOG_OUT(LOG_ERROR, "add_object() failed: wrapper=%p obj=%p type=SCALAR ret=%d.",
+    { // failed add_obj()
+        LOG_OUT(LOG_ERROR, "add_obj() failed: wrapper=%p obj=%p type=SCALAR ret=%d.",
                 new_wrapper, new_wrapper->obj, add_obj_ret);
         free(new_scalar);
         free(new_wrapper);
         return NULL;
     }
 
-    LOG_OUT(LOG_DEBUG, "create_scalar() succeeded: wrapper=%p obj=%p type=SCALAR.", new_wrapper,
-            new_wrapper->obj);
+    LOG_OUT(LOG_DEBUG, "succeeded: wrapper=%p obj=%p type=SCALAR.", new_wrapper, new_wrapper->obj);
     return new_wrapper;
 }
 
@@ -237,29 +237,39 @@ int destroy_obj(struct ObjWrapper* wrapper)
         return 0; // no wrapper is noop
 
     if (wrapper->type != OBJ_MATRIX && wrapper->type != OBJ_VECTOR && wrapper->type != OBJ_SCALAR)
+    {
+        LOG_OUT(LOG_ERROR, "wrapper=%p obj=%p has invalid type=%d.", wrapper, wrapper->obj,
+                wrapper->type);
         return 4; // invalid type
+    }
 
-    int remove_ret = remove_object(wrapper);
+    int remove_ret = remove_obj(wrapper);
     if (remove_ret)
+    {
+        LOG_OUT(LOG_ERROR, "remove_obj() failed wrapper=%p obj=%p type=%d ret=%d.", wrapper,
+                wrapper->obj, wrapper->type, remove_ret);
         return remove_ret; // remove failed
+    }
 
     switch (wrapper->type)
     {
     case OBJ_MATRIX:
         destroy_matrix((struct Matrix*)wrapper->obj);
-        wrapper->obj = NULL;
         break;
     case OBJ_VECTOR:
         destroy_vector((struct Vector*)wrapper->obj);
-        wrapper->obj = NULL;
         break;
     case OBJ_SCALAR:
         destroy_scalar((struct Scalar*)wrapper->obj);
-        wrapper->obj = NULL;
         break;
     default:
-        return 4; // invalid type
+        LOG_OUT(LOG_ERROR, "invariant violated wrapper=%p obj=%p type=%d.", wrapper,
+                wrapper->obj, wrapper->type);
+        assert(false); // should be unreachable
+        return 3;
     }
+
+    wrapper->obj = NULL;
     destroy_wrapper(wrapper);
     return 0;
 }
@@ -273,14 +283,14 @@ int incref_obj(struct ObjWrapper* wrapper)
         return 1; // caller error
     if (wrapper->ref_count == 0)
     {
-        LOG_OUT(LOG_ERROR, "incref_obj invariant violated: wrapper=%p obj=%p type=%d rc=%zu.",
-                wrapper, wrapper->obj, wrapper->type, wrapper->ref_count);
+        LOG_OUT(LOG_ERROR, "invariant violated: wrapper=%p obj=%p type=%d rc=%zu.", wrapper,
+                wrapper->obj, wrapper->type, wrapper->ref_count);
         return 3; // internal error
     }
 
     size_t old_rc = wrapper->ref_count;
     wrapper->ref_count++;
-    LOG_OUT(LOG_DEBUG, "incref_obj: wrapper=%p obj=%p type=%d rc:%zu->%zu.", wrapper, wrapper->obj,
+    LOG_OUT(LOG_DEBUG, "succeeded wrapper=%p obj=%p type=%d rc:%zu->%zu.", wrapper, wrapper->obj,
             wrapper->type, old_rc, wrapper->ref_count);
     return 0;
 }
@@ -296,8 +306,8 @@ int decref_obj(struct ObjWrapper* wrapper)
     assert(wrapper->ref_count != 0);
     if (wrapper->ref_count == 0)
     {
-        LOG_OUT(LOG_ERROR, "decref_obj invariant violated: wrapper=%p obj=%p type=%d rc=%zu.",
-                wrapper, wrapper->obj, wrapper->type, wrapper->ref_count);
+        LOG_OUT(LOG_ERROR, "invariant violated: wrapper=%p obj=%p type=%d rc=%zu.", wrapper,
+                wrapper->obj, wrapper->type, wrapper->ref_count);
         return 3; // internal error
     }
 
@@ -305,13 +315,13 @@ int decref_obj(struct ObjWrapper* wrapper)
     wrapper->ref_count--;
     if (wrapper->ref_count == 0) // destroy obj if ref_count -> 0
     {
-        LOG_OUT(LOG_DEBUG, "decref_obj: wrapper=%p obj=%p type=%d rc:%zu->%zu (destroy).", wrapper,
+        LOG_OUT(LOG_DEBUG, "wrapper=%p obj=%p type=%d rc:%zu->%zu (destroy).", wrapper,
                 wrapper->obj, wrapper->type, old_rc, wrapper->ref_count);
         destroy_obj(wrapper);
         return 0;
     }
 
-    LOG_OUT(LOG_DEBUG, "decref_obj: wrapper=%p obj=%p type=%d rc:%zu->%zu.", wrapper, wrapper->obj,
+    LOG_OUT(LOG_DEBUG, "succeeded wrapper=%p obj=%p type=%d rc:%zu->%zu.", wrapper, wrapper->obj,
             wrapper->type, old_rc, wrapper->ref_count);
     return 0;
 }
@@ -434,7 +444,7 @@ static int destroy_wrapper(struct ObjWrapper* wrapper)
 //    2: Allocation error.
 //    3: Internal invariance violation.
 //  Notes: Enforces invariant: one `obj_list` reference per object.
-static int add_object(struct ObjWrapper* object)
+static int add_obj(struct ObjWrapper* object)
 {
     // return immediately for invalid input
     if (!object)
@@ -473,7 +483,7 @@ static int add_object(struct ObjWrapper* object)
 //  Notes:
 //    - Enforces invariant: Removal not allowed from empty `obj_list`.
 //    - Enforces invariant: `obj_list.head` must exist.
-static int remove_object(struct ObjWrapper* object)
+static int remove_obj(struct ObjWrapper* object)
 {
     if (!object)
         return 1; // caller error

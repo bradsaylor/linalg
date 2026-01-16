@@ -35,8 +35,8 @@ struct RegistryHash;
   Create an empty registry hash table.
 @param table_size num elements in hash table; must be > 0.
 @return
-  Returns struct RegistryHash* on success. Returns NULL on allocation failure or
-  invalid table_size.
+  Returns struct RegistryHash* on success.
+  Returns NULL on allocation failure or invalid table_size.
 @pre
   table_size > 0
 @post
