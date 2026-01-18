@@ -64,8 +64,7 @@ static char* copy_name(const char* name);
 static int add_node(struct RegistryLL* new_node, struct RegistryLL** list_head);
 static int remove_node(struct RegistryLL* node, struct RegistryLL* prev_node,
                        struct RegistryLL** list_head);
-static int add_binding_already_bound(struct ObjWrapper* new_wrapper,
-                                     struct ObjWrapper* old_wrapper);
+static int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjWrapper** slot);
 static int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrapper,
                                    struct RegistryHash* reg_table, size_t index);
 static int free_registry_node(struct RegistryLL* node);
@@ -144,7 +143,7 @@ int add_binding(const char* name, struct ObjWrapper* object, struct RegistryHash
 {
     // return immediately on invalid input
     if (!name || name[0] == '\0' || !object || !reg_table || reg_table->size == 0)
-        return 3; // caller error
+        return 1; // caller error
 
     // local defines
     size_t index = hash(name) % reg_table->size;
@@ -154,7 +153,7 @@ int add_binding(const char* name, struct ObjWrapper* object, struct RegistryHash
     // if name already bound
     if (already_bound)
     {
-        return add_binding_already_bound(object, already_bound->object);
+        return add_binding_already_bound(object, &already_bound->object);
     }
 
     // if name is not bound create new node
@@ -345,30 +344,41 @@ static int remove_node(struct RegistryLL* node, struct RegistryLL* prev_node,
 //    0: On success.
 //    5: On failed incref_obj()
 //  Notes: Failed decref_obj() is an invariant violation
-static int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjWrapper* old_wrapper)
+static int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjWrapper** slot)
 {
-    if (new_wrapper == old_wrapper)
+    if (new_wrapper == *slot)
     { // already bound to object
+        LOG_OUT(LOG_DEBUG, "duplicate wrapper binding ignored wrapper=%p.", new_wrapper);
         return 0;
     }
     else
     { // name is bound to a different object (overwrite)
 
+        struct ObjWrapper* old_wrapper = *slot;
+
         // increment new wrapper
         int incref_ret = incref_obj(new_wrapper);
-        if (incref_ret)
+        if (incref_ret != 0)
+        {
+            LOG_OUT(LOG_ERROR, "incref_obj failure wrapper=%p ret=%d.", new_wrapper, incref_ret);
             return 5; // incref failure
-
+        }
         // replace found node object with caller `object`
-        old_wrapper = new_wrapper;
+        *slot = new_wrapper;
 
         // decrement previously bound wrapper
         int decref_ret = decref_obj(old_wrapper);
-        assert(decref_ret == 0); // invariant violation
+        if (decref_ret != 0)
+        {
+            LOG_OUT(LOG_ERROR, "decref_obj failure wrapper=%p ret=%d.", old_wrapper, decref_ret);
+            assert(decref_ret == 0); // invariant violation
+            return 3;
+        }
 
+        LOG_OUT(LOG_DEBUG, "registry overwrite occurred: old=%p new=%p type=%d.", old_wrapper, *slot,
+                get_obj_type(new_wrapper));
         return 0;
     }
-    return 0;
 }
 
 //  Purpose: Helper function for add_binding() when name is not already bound.
@@ -404,7 +414,7 @@ static int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrap
     if (incref_ret)
     {
         free_registry_node(new_node);
-        return 5; // incref failure
+        return 3; // incref failure
     }
 
     // add new node
@@ -416,10 +426,10 @@ static int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrap
     // failed to add new node
     else
     {
-        int decref_ret = decref_obj(new_node->object);
+        int decref_ret = decref_obj(new_wrapper);
         free_registry_node(new_node);
         assert(decref_ret == 0); // invariant violation
-        return add_node_return;
+        return 3;
     }
 }
 
