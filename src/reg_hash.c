@@ -1,12 +1,12 @@
-#include "../include/reg_hash.h"
+#include "reg_hash.h"
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/logs.h"
-#include "../include/math_objs.h"
+#include "logs.h"
+#include "math_objs.h"
 
 #pragma region Head Comment
 /*

@@ -3,7 +3,8 @@
 
 #include <stdlib.h>
 
-#include "./linalg.h"
+#include "linalg.h"
+#include "linalg_types.h"
 
 /* ============================================================================
  * Public types

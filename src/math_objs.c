@@ -1,5 +1,5 @@
-#include "../include/math_objs.h"
-#include "../include/logs.h"
+#include "math_objs.h"
+#include "logs.h"
 
 #include <assert.h>
 #include <stdbool.h>
@@ -121,8 +121,7 @@ struct ObjWrapper* create_matrix(struct List elements, size_t num_rows, size_t n
     int add_obj_ret = add_obj(new_wrapper);
     if (add_obj_ret)
     {
-        LOG_OUT(LOG_ERROR,
-                "add_obj() failed: wrapper=%p obj=%p type=MATRIX dims=%zuX%zu ret=%d.",
+        LOG_OUT(LOG_ERROR, "add_obj() failed: wrapper=%p obj=%p type=MATRIX dims=%zuX%zu ret=%d.",
                 new_wrapper, new_wrapper->obj, num_rows, num_cols, add_obj_ret);
         free(new_matrix);
         free(new_wrapper);
@@ -220,8 +219,8 @@ struct ObjWrapper* create_scalar(double value)
     int add_obj_ret = add_obj(new_wrapper);
     if (add_obj_ret)
     { // failed add_obj()
-        LOG_OUT(LOG_ERROR, "add_obj() failed: wrapper=%p obj=%p type=SCALAR ret=%d.",
-                new_wrapper, new_wrapper->obj, add_obj_ret);
+        LOG_OUT(LOG_ERROR, "add_obj() failed: wrapper=%p obj=%p type=SCALAR ret=%d.", new_wrapper,
+                new_wrapper->obj, add_obj_ret);
         free(new_scalar);
         free(new_wrapper);
         return NULL;
@@ -263,8 +262,8 @@ int destroy_obj(struct ObjWrapper* wrapper)
         destroy_scalar((struct Scalar*)wrapper->obj);
         break;
     default:
-        LOG_OUT(LOG_ERROR, "invariant violated wrapper=%p obj=%p type=%d.", wrapper,
-                wrapper->obj, wrapper->type);
+        LOG_OUT(LOG_ERROR, "invariant violated wrapper=%p obj=%p type=%d.", wrapper, wrapper->obj,
+                wrapper->type);
         assert(false); // should be unreachable
         return 3;
     }
