@@ -120,6 +120,12 @@ int destroy_reg_table(struct RegistryHash* reg_table)
     if (!reg_table)
         return 0; // return 0 if passed NULL
 
+    LOG_OUT(LOG_DEBUG, "reg_table teardown beginning table=%p size=%zu.", reg_table,
+            reg_table->size);
+
+    size_t decref_obj_count = 0;
+    size_t free_node_count = 0;
+
     for (size_t i = 0; i < reg_table->size; i++)
     {
         struct RegistryLL* node = reg_table->table[i];
@@ -128,12 +134,25 @@ int destroy_reg_table(struct RegistryHash* reg_table)
         while (node)
         {
             int decref_ret = decref_obj(node->object);
-            assert(decref_ret == 0);
+            if (decref_ret != 0)
+            {
+                LOG_OUT(LOG_ERROR, "decref_obj() failed ptr=%p name=%s slot=%zu rtn=%d.",
+                        node->object, node->name, i, decref_ret);
+                assert(decref_ret == 0);
+            }
+            else
+                decref_obj_count++;
             next_node = node->next;
             free_registry_node(node);
+            free_node_count++;
             node = next_node;
         }
     }
+
+    LOG_OUT(LOG_DEBUG,
+            "reg_table teardown ended table=%p size=%zu decref_count=%zu free_node_count=%zu.",
+            reg_table, reg_table->size, decref_obj_count, free_node_count);
+
     free(reg_table->table);
     free(reg_table);
     return 0;
@@ -175,15 +194,25 @@ int remove_binding(const char* name, struct RegistryHash* reg_table)
     if (!found_node)
         return 1;
     if (!found_node->object)
+    {
+        LOG_OUT(LOG_ERROR, "missing object name=%s node_ptr=%p slot=%zu.", name, found_node, index);
         return 4; // internal registry error
+    }
 
     // remove/free the node
     remove_node(found_node, prev_node, &reg_table->table[index]);
+    struct ObjWrapper* node_object =
+        found_node->object; // store for freeing after found_node released
     free_registry_node(found_node);
 
     // decrement the node wrapper
-    int decref_ret = decref_obj(found_node->object);
-    assert(decref_ret == 0); // internal invariant violation
+    int decref_ret = decref_obj(node_object);
+    if (decref_ret != 0)
+    {
+        LOG_OUT(LOG_ERROR, "decref_obj() failed rtn=%d name=%s obj=%p slot=%zu.", decref_ret, name,
+                node_object, index);
+        assert(decref_ret == 0); // internal invariant violation
+    }
 
     return 0;
 }
@@ -375,8 +404,8 @@ static int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjW
             return 3;
         }
 
-        LOG_OUT(LOG_DEBUG, "registry overwrite occurred: old=%p new=%p type=%d.", old_wrapper, *slot,
-                get_obj_type(new_wrapper));
+        LOG_OUT(LOG_DEBUG, "registry overwrite occurred: old=%p new=%p type=%d.", old_wrapper,
+                *slot, get_obj_type(new_wrapper));
         return 0;
     }
 }
@@ -395,11 +424,16 @@ static int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrap
 {
     char* new_name = copy_name(name);
     if (!new_name)
+    {
+        LOG_OUT(LOG_ERROR, "failed to copy name=%s for ptr=%p", name, new_wrapper);
         return 2; // allocation failure
+    }
 
     struct RegistryLL* new_node = malloc(sizeof(struct RegistryLL));
     if (!new_node)
     {
+        LOG_OUT(LOG_ERROR, "failed to allocate %zu bytes for registry node.",
+                sizeof(struct RegistryLL));
         free(new_name);
         return 2; // allocation failure
     }
@@ -413,19 +447,26 @@ static int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrap
     int incref_ret = incref_obj(new_node->object);
     if (incref_ret)
     {
+        LOG_OUT(LOG_ERROR, "incref_obj() failed with ret=%d.", incref_ret);
         free_registry_node(new_node);
-        return 3; // incref failure
+        return 5; // incref failure
     }
 
     // add new node
     int add_node_return = add_node(new_node, &reg_table->table[index]);
     // successfully added node
     if (add_node_return == 0)
+    {
+        LOG_OUT(LOG_DEBUG, "added object binding name=%s ptr=%p slot=%zu.", name, new_wrapper,
+                index);
         return 0;
+    }
 
     // failed to add new node
     else
     {
+        LOG_OUT(LOG_ERROR, "add_node() failed name=%s ptr=%p ret=%d slot=%zu.", name, new_node,
+                add_node_return, index);
         int decref_ret = decref_obj(new_wrapper);
         free_registry_node(new_node);
         assert(decref_ret == 0); // invariant violation
