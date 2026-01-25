@@ -8,7 +8,7 @@
       "name": "(gdb) Launch",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/tests/test_builds/math_objs_tests",
+      "program": "${workspaceFolder}/tests/test_builds/linalg_tests",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",

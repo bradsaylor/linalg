@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/linalg.h"
-#include "../include/math_objs.h"
+#include "linalg_types.h"
+#include "math_objs.h"
 
 #define DELIM "********************************************\n"
 

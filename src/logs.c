@@ -5,7 +5,7 @@
 #include <string.h>
 #include <time.h>
 
-static LogType log_level = LOG_NONE;
+static LogType log_level = LOG_ALL;
 static FILE* log_sink = NULL;
 
 /* ============================================================================

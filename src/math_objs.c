@@ -62,7 +62,7 @@ static int destroy_wrapper(struct ObjWrapper* wrapper);
 static int add_obj(struct ObjWrapper* object);
 static int remove_obj(struct ObjWrapper* object);
 static int destroy_obj(struct ObjWrapper* wrapper);
-static struct ObjLLNode* find_node(struct ObjWrapper* wrapper, struct ObjLLNode* prev_node);
+static struct ObjLLNode* find_node(struct ObjWrapper* wrapper, struct ObjLLNode** prev_node);
 #pragma endregion
 
 #pragma region Public API
@@ -342,6 +342,7 @@ enum ObjType get_obj_type(const struct ObjWrapper* wrapper)
 //  Asserts invariant: obj_list.head == NULL after teardown.
 int destroy_obj_list()
 {
+    LOG_OUT(LOG_DEBUG, "beginning obj_list teardown count=%zu", obj_list.count);
     while (obj_list.head)
     {
         assert(obj_list.head->object->ref_count == 1);
@@ -351,6 +352,7 @@ int destroy_obj_list()
     }
 
     assert(obj_list.count == 0 && obj_list.head == NULL);
+    LOG_OUT(LOG_DEBUG, "ended obj_list teardown count=%zu", obj_list.count);
 
     return 0;
 }
@@ -451,7 +453,7 @@ static int add_obj(struct ObjWrapper* object)
 
     // check if object is already in the object list
     struct ObjLLNode* prev_node = NULL;
-    struct ObjLLNode* found_node = find_node(object, prev_node);
+    struct ObjLLNode* found_node = find_node(object, &prev_node);
     if (found_node)
         return 3; // invariant violation
 
@@ -490,7 +492,7 @@ static int remove_obj(struct ObjWrapper* object)
         return 3; // internal error
 
     struct ObjLLNode* prev_node = NULL;
-    struct ObjLLNode* search_node = find_node(object, prev_node);
+    struct ObjLLNode* search_node = find_node(object, &prev_node);
 
     // node found
     if (search_node)
@@ -524,7 +526,7 @@ static int remove_obj(struct ObjWrapper* object)
 //  Notes:
 //    `prev_node` populated if `wrapper` found and `wrapper` is not the first
 //    list element.
-static struct ObjLLNode* find_node(struct ObjWrapper* wrapper, struct ObjLLNode* prev_node)
+static struct ObjLLNode* find_node(struct ObjWrapper* wrapper, struct ObjLLNode** prev_node)
 {
     struct ObjLLNode* search_node = obj_list.head;
     while (search_node)
@@ -532,7 +534,7 @@ static struct ObjLLNode* find_node(struct ObjWrapper* wrapper, struct ObjLLNode*
         if (search_node->object == wrapper)
             return search_node;
         else
-            prev_node = search_node;
+            *prev_node = search_node;
         search_node = search_node->next;
     }
     return NULL;

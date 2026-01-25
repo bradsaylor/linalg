@@ -206,6 +206,7 @@ int remove_binding(const char* name, struct RegistryHash* reg_table)
     free_registry_node(found_node);
 
     // decrement the node wrapper
+    LOG_OUT(LOG_DEBUG, "calling decref_obj() obj=%p name=%s", node_object, name);
     int decref_ret = decref_obj(node_object);
     if (decref_ret != 0)
     {
@@ -396,6 +397,8 @@ static int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjW
         *slot = new_wrapper;
 
         // decrement previously bound wrapper
+        LOG_OUT(LOG_DEBUG, "calling decref_obj() after overwrite of ptr=%p type=%d", old_wrapper,
+                get_obj_type(old_wrapper));
         int decref_ret = decref_obj(old_wrapper);
         if (decref_ret != 0)
         {
@@ -465,8 +468,8 @@ static int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrap
     // failed to add new node
     else
     {
-        LOG_OUT(LOG_ERROR, "add_node() failed name=%s ptr=%p ret=%d slot=%zu.", name, new_node,
-                add_node_return, index);
+        LOG_OUT(LOG_ERROR, "add_node() failed name=%s ptr=%p ret=%d slot=%zu calling decref_obj().",
+                name, new_node, add_node_return, index);
         int decref_ret = decref_obj(new_wrapper);
         free_registry_node(new_node);
         assert(decref_ret == 0); // invariant violation
@@ -483,5 +486,7 @@ static int free_registry_node(struct RegistryLL* node)
 {
     free(node->name);
     free(node);
+
+    return 0;
 }
 #pragma endregion

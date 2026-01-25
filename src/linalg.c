@@ -121,9 +121,9 @@ int linalg_remove_binding(const char* name)
 
 int linalg_shutdown()
 {
-    destroy_obj_list();
     destroy_reg_table(g_reg_table);
     g_reg_table = NULL;
+    destroy_obj_list();
 
     return 0;
 }

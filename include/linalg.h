@@ -52,11 +52,11 @@
     2: Allocation failure.
     3: Internal error.
  @pre
-    - name != NULL and name[0] != '\0'.
-    - elements.list != NULL.
-    - elements.type_size > 0.
-    - num_rows > 0, num_cols > 0.
-    - elements.size == num_rows * num_cols.
+    1. name != NULL and name[0] != '\0'.
+    2. elements.list != NULL.
+    3. elements.type_size > 0.
+    4. num_rows > 0, num_cols > 0.
+    5. elements.size == num_rows * num_cols.
  */
 int linalg_create_bind_matrix(struct List elements, size_t num_rows, size_t num_cols,
                               const char* name);

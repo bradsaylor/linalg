@@ -2,8 +2,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "../include/math_objs.h"
-#include "../include/reg_hash.h"
+#include "math_objs.h"
+#include "reg_hash.h"
 
 /* ============================================================================
  * File-local definitions
