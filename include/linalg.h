@@ -88,7 +88,7 @@ int linalg_create_bind_vector(struct List elements, const char* name);
     2: Allocation failure.
     3: Internal error.
  @pre
-    - name != NULL and name[0] != '\0'.
+    1. name != NULL and name[0] != '\0'.
  */
 int linalg_create_bind_scalar(double value, const char* name);
 

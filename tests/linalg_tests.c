@@ -30,6 +30,10 @@ int test_linalg_create_bind_vector_02();
 int test_linalg_create_bind_vector_03();
 int test_linalg_create_bind_vector_04();
 
+int test_linalg_create_bind_scalar_00();
+int test_linalg_create_bind_scalar_01a();
+int test_linalg_create_bind_scalar_01b();
+
 /* ============================================================================
  * Helper function prototypes
  * ============================================================================
@@ -59,11 +63,14 @@ int main()
     assert(test_linalg_create_bind_vector_00() == 0);
     assert(test_linalg_create_bind_vector_01a() == 0);
     assert(test_linalg_create_bind_vector_01b() == 0);
-    /*
     assert(test_linalg_create_bind_vector_02() == 0);
     assert(test_linalg_create_bind_vector_03() == 0);
     assert(test_linalg_create_bind_vector_04() == 0);
-    */
+
+    assert(test_linalg_create_bind_scalar_00() == 0);
+    assert(test_linalg_create_bind_scalar_01a() == 0);
+    assert(test_linalg_create_bind_scalar_01b() == 0);
+
     return 0;
 }
 #pragma endregion
@@ -552,22 +559,245 @@ int test_linalg_create_bind_vector_01b()
     return rc;
 }
 
-/*
-
 int test_linalg_create_bind_vector_02()
 {
+    // Violates condition:  2. elements.list != NULL.
+
+    const char* test_name = "test_linalg_create_bind_vector_02";
+
+    // create objects for test
+    struct List elements = {0};
+    return_valid_vector_components(&elements);
+    const char* name = "test";
+
+    int rc = 1;
+
+    // invalidate elements.list
+    free(elements.list);
+    elements.list = NULL;
+
+    do
+    {
+        // init reg_table
+        bool init_table_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (init_table_OK == false)
+        {
+            printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool null_list_rtns_2 = (linalg_create_bind_vector(elements, name) == 2);
+        if (null_list_rtns_2 == false)
+        {
+            printf("%s FAILED on null_list_rtns_2.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
 }
 
 int test_linalg_create_bind_vector_03()
 {
+    // Violates condition:  3. elements.size > 0.
+
+    const char* test_name = "test_linalg_create_bind_vector_03";
+
+    // create objects for test
+    struct List elements = {0};
+    return_valid_vector_components(&elements);
+    const char* name = "test";
+
+    int rc = 1;
+
+    // invalidate elements.size
+    elements.size = 0;
+
+    do
+    {
+        // init reg_table
+        bool init_table_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (init_table_OK == false)
+        {
+            printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool invalid_size_rtns_2 = (linalg_create_bind_vector(elements, name) == 2);
+        if (invalid_size_rtns_2 == false)
+        {
+            printf("%s FAILED on invalid_size_rtns_2.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
 }
 
 int test_linalg_create_bind_vector_04()
 {
+    // Violates condition:  4. elements.type_size > 0.
+
+    const char* test_name = "test_linalg_create_bind_vector_04";
+
+    // create objects for test
+    struct List elements = {0};
+    return_valid_vector_components(&elements);
+    const char* name = "test";
+
+    int rc = 1;
+
+    // invalidate elements.type_size
+    elements.type_size = 0;
+
+    do
+    {
+        // init reg_table
+        bool init_table_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (init_table_OK == false)
+        {
+            printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool invalid_type_size_rtns_2 = (linalg_create_bind_vector(elements, name) == 2);
+        if (invalid_type_size_rtns_2 == false)
+        {
+            printf("%s FAILED on invalid_type_size_rtns_2.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
+}
+#pragma endregion
+
+#pragma region linalg_create_bind_scalar() tests
+int test_linalg_create_bind_scalar_00()
+{
+    // tests valid input
+
+    const char* test_name = "test_linalg_create_bind_scalar_00";
+
+    // create objects for test
+    const char* name = "test";
+
+    int rc = 1;
+
+    do
+    {
+        // init reg_table
+        bool init_table_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (init_table_OK == false)
+        {
+            printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool rtn_0_OK = (linalg_create_bind_scalar(3.14, name) == 0);
+        if (rtn_0_OK == false)
+        {
+            printf("%s FAILED on rtn_0_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
 }
 
-*/
+int test_linalg_create_bind_scalar_01a()
+{
+    // Violates condition:  1. name != NULL.
 
+    const char* test_name = "test_linalg_create_bind_scalar_01a";
+
+    // create objects for test
+    const char* name = NULL;
+
+    int rc = 1;
+
+    do
+    {
+        // init reg_table
+        bool init_table_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (init_table_OK == false)
+        {
+            printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool null_name_rtns_3 = (linalg_create_bind_scalar(3.14, name) == 3);
+        if (null_name_rtns_3 == false)
+        {
+            printf("%s FAILED on null_name_rtns_3.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
+}
+
+int test_linalg_create_bind_scalar_01b()
+{
+    // Violates condition:  1. name[0] != '\0'.
+
+    const char* test_name = "test_linalg_create_bind_scalar_01b";
+
+    // create objects for test
+    const char* name = "\0";
+
+    int rc = 1;
+
+    do
+    {
+        // init reg_table
+        bool init_table_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (init_table_OK == false)
+        {
+            printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool empty_name_rtns_3 = (linalg_create_bind_scalar(3.14, name) == 3);
+        if (empty_name_rtns_3 == false)
+        {
+            printf("%s FAILED on empty_name_rtns_3.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
+}
 #pragma endregion
 
 #pragma region helper functions
