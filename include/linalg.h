@@ -71,10 +71,10 @@ int linalg_create_bind_matrix(struct List elements, size_t num_rows, size_t num_
     2: Allocation failure.
     3: Internal error.
  @pre
-    - name != NULL and name[0] != '\0'.
-    - elements.list != NULL.
-    - elements.size > 0.
-    - elements.type_size > 0.
+    1. name != NULL and name[0] != '\0'.
+    2. elements.list != NULL.
+    3. elements.size > 0.
+    4. elements.type_size > 0.
  */
 int linalg_create_bind_vector(struct List elements, const char* name);
 
@@ -89,7 +89,6 @@ int linalg_create_bind_vector(struct List elements, const char* name);
     3: Internal error.
  @pre
     - name != NULL and name[0] != '\0'.
-
  */
 int linalg_create_bind_scalar(double value, const char* name);
 
