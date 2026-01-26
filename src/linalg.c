@@ -1,4 +1,5 @@
 #include "linalg.h"
+#include "logs.h"
 #include "math_objs.h"
 #include "reg_hash.h"
 

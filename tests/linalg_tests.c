@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "linalg.h"
+#include "logs.h"
 
 #define DELIM "********************************************\n"
 #define TABLE_SIZE 256
@@ -14,8 +15,9 @@
  * ============================================================================
  */
 int test_linalg_create_bind_matrix_00();
+int test_linalg_create_bind_matrix_01a();
+int test_linalg_create_bind_matrix_01b();
 /*
-int test_linalg_create_bind_matrix_01();
 int test_linalg_create_bind_matrix_02();
 int test_linalg_create_bind_matrix_03();
 int test_linalg_create_bind_matrix_04();
@@ -37,15 +39,18 @@ int return_valid_vector_components(struct List* elements);
  */
 int main()
 {
+    set_log_level(LOG_ERROR);
+
     assert(test_linalg_create_bind_matrix_00() == 0);
+    assert(test_linalg_create_bind_matrix_01a() == 0);
+    assert(test_linalg_create_bind_matrix_01b() == 0);
     /*
-    assert(test_linalg_create_bind_matrix_01() == 0);
     assert(test_linalg_create_bind_matrix_02() == 0);
     assert(test_linalg_create_bind_matrix_03() == 0);
     assert(test_linalg_create_bind_matrix_04() == 0);
     assert(test_linalg_create_bind_matrix_05() == 0);
     */
-   
+
     return 0;
 }
 #pragma endregion
@@ -96,23 +101,96 @@ int test_linalg_create_bind_matrix_00()
     linalg_shutdown();
     return rc;
 }
-/*
-int test_linalg_create_bind_matrix_01()
-{
-    // Violates condition:    1. name != NULL and name[0] != '\0'.
 
-    const char* test_name = "test_linalg_create_bind_matrix_01";
+int test_linalg_create_bind_matrix_01a()
+{
+    // Violates condition:    1. name != NULL.
+
+    const char* test_name = "test_linalg_create_bind_matrix_01a";
 
     // create objects for test
     struct List elements = {0};
-    int num_rows = 0;
-    int num_cols = 0;
+    size_t num_rows = 0;
+    size_t num_cols = 0;
     return_valid_matrix_components(&elements, &num_rows, &num_cols);
-    const char* name = "test";
 
-    // init reg_table
-    linalg_init_reg_table(TABLE_SIZE);
+    int rc = 1;
+
+    // invalidate name
+    const char* invalid_name = NULL;
+
+    do
+    {
+        // init reg_table
+        bool init_talbe_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (init_talbe_OK == false)
+        {
+            printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool null_name_rtns_3 =
+            (linalg_create_bind_matrix(elements, num_rows, num_cols, invalid_name) == 3);
+        if (null_name_rtns_3 == false)
+        {
+            printf("%s, FAILED on null_name_rtns_3.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
 }
+
+int test_linalg_create_bind_matrix_01b()
+{
+    // Violates condition:    1. name[0] != '\0'.
+
+    const char* test_name = "test_linalg_create_bind_matrix_01b";
+
+    // create objects for test
+    struct List elements = {0};
+    size_t num_rows = 0;
+    size_t num_cols = 0;
+    return_valid_matrix_components(&elements, &num_rows, &num_cols);
+
+    int rc = 1;
+
+    // invalidate name
+    const char* invalid_name = "\0";
+
+    do
+    {
+        // init reg_table
+        bool init_talbe_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (init_talbe_OK == false)
+        {
+            printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool null_name_rtns_3 =
+            (linalg_create_bind_matrix(elements, num_rows, num_cols, invalid_name) == 3);
+        if (null_name_rtns_3 == false)
+        {
+            printf("%s, FAILED on null_name_rtns_3.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
+}
+
+/*
 
 int test_linalg_create_bind_matrix_02()
 {
@@ -183,7 +261,6 @@ int test_linalg_create_bind_matrix_05()
 }
 */
 #pragma endregion
-
 
 #pragma region helper functions
 /* ============================================================================
