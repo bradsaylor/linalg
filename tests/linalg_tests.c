@@ -34,6 +34,13 @@ int test_linalg_create_bind_scalar_00();
 int test_linalg_create_bind_scalar_01a();
 int test_linalg_create_bind_scalar_01b();
 
+int test_linalg_init_reg_table_00();
+int test_linalg_init_reg_table_01();
+
+int test_linalg_remove_binding_00();
+int test_linalg_remove_binding_01();
+int test_linalg_remove_binding_02();
+
 /* ============================================================================
  * Helper function prototypes
  * ============================================================================
@@ -70,6 +77,13 @@ int main()
     assert(test_linalg_create_bind_scalar_00() == 0);
     assert(test_linalg_create_bind_scalar_01a() == 0);
     assert(test_linalg_create_bind_scalar_01b() == 0);
+
+    assert(test_linalg_init_reg_table_00() == 0);
+    assert(test_linalg_init_reg_table_01() == 0);
+
+    assert(test_linalg_remove_binding_00() == 0);
+    assert(test_linalg_remove_binding_01() == 0);
+    assert(test_linalg_remove_binding_02() == 0);
 
     return 0;
 }
@@ -438,6 +452,11 @@ int test_linalg_create_bind_matrix_05()
 #pragma endregion
 
 #pragma region linalg_create_bind_vector() tests
+/* ============================================================================
+ * linalg_create_bind_vector() tests
+ * ============================================================================
+ */
+
 int test_linalg_create_bind_vector_00()
 {
     // test for valid input
@@ -688,6 +707,11 @@ int test_linalg_create_bind_vector_04()
 #pragma endregion
 
 #pragma region linalg_create_bind_scalar() tests
+/* ============================================================================
+ * linalg_create_bind_scalar() tests
+ * ============================================================================
+ */
+
 int test_linalg_create_bind_scalar_00()
 {
     // tests valid input
@@ -787,6 +811,230 @@ int test_linalg_create_bind_scalar_01b()
         if (empty_name_rtns_3 == false)
         {
             printf("%s FAILED on empty_name_rtns_3.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
+}
+#pragma endregion
+
+#pragma region linalg_shutdown() tests
+/* ============================================================================
+ * linalg_shutdown() tests
+ * ============================================================================
+ */
+
+// None.
+#pragma endregion
+
+#pragma region linalg_init_reg_table() tests
+/* ============================================================================
+ * linalg_shutdown() tests
+ * ============================================================================
+ */
+
+int test_linalg_init_reg_table_00()
+{
+    // test for valid input
+
+    const char* test_name = "test_linalg_init_reg_table_00";
+
+    int rc = 1;
+
+    do
+    {
+        bool table_init_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (table_init_OK == false)
+        {
+            printf("%s FAILED table_init_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
+}
+
+int test_linalg_init_reg_table_01()
+{
+    // Violates condition:  1. table_size > 0
+
+    const char* test_name = "test_linalg_init_reg_table_01";
+    size_t table_size = 0;
+
+    int rc = 1;
+
+    do
+    {
+        bool zero_table_size_rtns_2 = (linalg_init_reg_table(table_size) == 2);
+        if (zero_table_size_rtns_2 == false)
+        {
+            printf("%s FAILED on zero_table_size_rtns_2.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
+}
+#pragma endregion
+
+#pragma region linalg_remove_binding() tests
+/* ============================================================================
+ * linalg_remove_binding() tests
+ * ============================================================================
+ */
+
+int test_linalg_remove_binding_00()
+{
+    // test for valid input
+
+    const char* test_name = "test_linalg_remove_binding_00";
+
+    // create objects for test
+    struct List elements = {0};
+    size_t num_rows = 0;
+    size_t num_cols = 0;
+    return_valid_matrix_components(&elements, &num_rows, &num_cols);
+    const char* name = "test";
+
+    int rc = 1;
+
+    do
+    {
+        // init reg_table
+        bool init_table_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (init_table_OK == false)
+        {
+            printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool bind_OK = (linalg_create_bind_matrix(elements, num_rows, num_cols, name) == 0);
+        if (bind_OK == false)
+        {
+            printf("%s FAILED on bind_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool rtn_0_OK = (linalg_remove_binding(name) == 0);
+        if (rtn_0_OK == false)
+        {
+            printf("%s FAILED on rtn_0_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
+}
+
+int test_linalg_remove_binding_01()
+{
+    // Violates condition:   1. name != NULL.
+
+    const char* test_name = "test_linalg_remove_binding_01";
+
+    // create objects for test
+    struct List elements = {0};
+    size_t num_rows = 0;
+    size_t num_cols = 0;
+    return_valid_matrix_components(&elements, &num_rows, &num_cols);
+    const char* name = "test";
+
+    int rc = 1;
+
+    // invalidate name
+    const char* null_name = NULL;
+
+    do
+    {
+        bool init_table_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (init_table_OK == false)
+        {
+            printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool bind_OK = (linalg_create_bind_matrix(elements, num_rows, num_cols, name) == 0);
+        if (bind_OK == false)
+        {
+            printf("%s FAILED on bind_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool null_name_rtns_1 = (linalg_remove_binding(null_name) == 1);
+        if (null_name_rtns_1 == false)
+        {
+            printf("%s FAILED on null_name_rtns_1.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        printf("%s PASSED.\n%s\n", test_name, DELIM);
+        rc = 0;
+
+    } while (0);
+
+    linalg_shutdown();
+    return rc;
+}
+
+int test_linalg_remove_binding_02()
+{
+    // Violates condition:   2. name[0] != '\0'.
+
+    const char* test_name = "test_linalg_remove_binding_02";
+
+    // create objects for test
+    struct List elements = {0};
+    size_t num_rows = 0;
+    size_t num_cols = 0;
+    return_valid_matrix_components(&elements, &num_rows, &num_cols);
+    const char* name = "test";
+
+    int rc = 1;
+
+    // invalidate name
+    const char* empty_name = NULL;
+
+    do
+    {
+        bool init_table_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (init_table_OK == false)
+        {
+            printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool bind_OK = (linalg_create_bind_matrix(elements, num_rows, num_cols, name) == 0);
+        if (bind_OK == false)
+        {
+            printf("%s FAILED on bind_OK.\n%s\n", test_name, DELIM);
+            break;
+        }
+
+        bool empty_name_rtns_1 = (linalg_remove_binding(empty_name) == 1);
+        if (empty_name_rtns_1 == false)
+        {
+            printf("%s FAILED on empty_name_rtns_1.\n%s\n", test_name, DELIM);
             break;
         }
 

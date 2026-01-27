@@ -109,7 +109,7 @@ int linalg_shutdown(void);
     0: Success.
     2: Failure.
  @pre
-  table_size > 0
+    1. table_size > 0
  @post
     Registry is initialized and safe to create+bind APIs.
  @note
@@ -126,8 +126,8 @@ int linalg_init_reg_table(size_t table_size);
    2: Reserved (not returned by this function).
    3: Internal error.
  @pre
-   - name != NULL.
-   - name[0] != '\0'.
+   1. name != NULL.
+   2. name[0] != '\0'.
  @post
     - If binding exists:
         - Binding for `name` is removed.
