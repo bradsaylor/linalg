@@ -49,8 +49,9 @@
  @return
     0: Success.
     1: Invalid input.
-    2: Allocation failure.
+    2: Allocation failure, elements.list destroyed, caller must not free.
     3: Internal error.
+    4: Allocation failure, caller owns elements.list.
  @pre
     1. name != NULL and name[0] != '\0'.
     2. elements.list != NULL.

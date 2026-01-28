@@ -79,12 +79,12 @@ int destroy_reg_table(struct RegistryHash* reg_table);
   incref_obj()/decref_obj()
 @param reg_table Registry hash table.
 @return
-  0 if success.
-  1 if add_node() failure.
-  2 if failed allocation.
-  3 if invalid input.
-  4 not used.
-  5 if incref_obj() failure.
+  0: success.
+  1: invalid input.
+  2: allocation failure.
+  3: decref_obj() failure.
+  4: incref_obj() failure.
+  5: add_node() failure.
 @pre
   reg_table != NULL.
   name != NULL and name[0] != '\0'.

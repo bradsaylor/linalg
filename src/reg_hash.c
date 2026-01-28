@@ -372,7 +372,8 @@ static int remove_node(struct RegistryLL* node, struct RegistryLL* prev_node,
 //      Replace `old_wrapper` with `new_wrapper` in registry.
 //  Returns:
 //    0: On success.
-//    5: On failed incref_obj()
+//    3: On failed decref_obj().
+//    4: On failed incref_obj().
 //  Notes: Failed decref_obj() is an invariant violation
 static int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjWrapper** slot)
 {
@@ -391,7 +392,7 @@ static int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjW
         if (incref_ret != 0)
         {
             LOG_OUT(LOG_ERROR, "incref_obj failure wrapper=%p ret=%d.", new_wrapper, incref_ret);
-            return 5; // incref failure
+            return 4; // incref failure
         }
         // replace found node object with caller `object`
         *slot = new_wrapper;
@@ -418,10 +419,11 @@ static int add_binding_already_bound(struct ObjWrapper* new_wrapper, struct ObjW
 //  Effects: New node added to Registry linked list.
 //  Returns:
 //    0: Success.
-//    1: add_node() failure.
 //    2: Allocation failure.
-//    5: Incref_obj() failure.
-//  Notes: None.
+//    3: decref_obj() failure.
+//    4: incref_obj() failure.
+//    5: add_node() failure.
+//  Notes: Failed decref_obj() is an invariant violation
 static int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrapper,
                                    struct RegistryHash* reg_table, size_t index)
 {
@@ -452,7 +454,7 @@ static int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrap
     {
         LOG_OUT(LOG_ERROR, "incref_obj() failed with ret=%d.", incref_ret);
         free_registry_node(new_node);
-        return 5; // incref failure
+        return 4; // incref failure
     }
 
     // add new node
@@ -472,8 +474,12 @@ static int add_binding_new_binding(const char* name, struct ObjWrapper* new_wrap
                 name, new_node, add_node_return, index);
         int decref_ret = decref_obj(new_wrapper);
         free_registry_node(new_node);
-        assert(decref_ret == 0); // invariant violation
-        return 3;
+        if (decref_ret != 0)
+        {
+            assert(decref_ret == 0); // invariant violation
+            return 3;
+        }
+        return 5; // add_node() failure
     }
 }
 

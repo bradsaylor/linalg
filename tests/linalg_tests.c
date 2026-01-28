@@ -106,7 +106,7 @@ int test_linalg_create_bind_matrix_00()
     size_t num_rows = 0;
     size_t num_cols = 0;
     return_valid_matrix_components(&elements, &num_rows, &num_cols);
-    const char* name = "test";
+    const char* name = test_name;
 
     int rc = 1;
 
@@ -116,15 +116,18 @@ int test_linalg_create_bind_matrix_00()
         bool init_table_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
         if (init_table_OK == false)
         {
+            free(elements.list);
             printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
             break;
         }
 
-        bool rtn_OK = (linalg_create_bind_matrix(elements, num_rows, num_cols, name) == 0);
+        int create_bind_rtn = linalg_create_bind_matrix(elements, num_rows, num_cols, name);
+        bool rtn_OK = (create_bind_rtn == 0);
         if (rtn_OK == false)
         {
+            if (create_bind_rtn == 4) // failed with elements.list ownership retained
+                free(elements.list);
             printf("%s FAILED on rtn_OK.\n%s\n", test_name, DELIM);
-            free(elements.list);
             break;
         }
 
@@ -156,20 +159,23 @@ int test_linalg_create_bind_matrix_01a()
     do
     {
         // init reg_table
-        bool init_talbe_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
-        if (init_talbe_OK == false)
+        bool init_table_OK = (linalg_init_reg_table(TABLE_SIZE) == 0);
+        if (init_table_OK == false)
         {
+            free(elements.list);
             printf("%s FAILED on init_table_OK.\n%s\n", test_name, DELIM);
             break;
         }
 
-        bool null_name_rtns_3 =
-            (linalg_create_bind_matrix(elements, num_rows, num_cols, invalid_name) == 3);
-        if (null_name_rtns_3 == false)
+        int create_bind_rtn = linalg_create_bind_matrix(elements, num_rows, num_cols, invalid_name);
+        bool null_name_rtns_4 = (create_bind_rtn == 4);
+        if (null_name_rtns_4 == false)
         {
-            printf("%s, FAILED on null_name_rtns_3.\n%s\n", test_name, DELIM);
+            printf("%s, FAILED on null_name_rtns_4.\n%s\n", test_name, DELIM);
             break;
         }
+        else
+            free(elements.list);
 
         printf("%s PASSED.\n%s\n", test_name, DELIM);
         rc = 0;
@@ -1013,7 +1019,7 @@ int test_linalg_remove_binding_02()
     int rc = 1;
 
     // invalidate name
-    const char* empty_name = NULL;
+    const char* empty_name = "\0";
 
     do
     {

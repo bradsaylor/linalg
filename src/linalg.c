@@ -10,7 +10,7 @@ int linalg_create_bind_matrix(struct List elements, size_t num_rows, size_t num_
 {
     struct ObjWrapper* new_matrix = create_matrix(elements, num_rows, num_cols);
     if (new_matrix == NULL)
-        return 2;
+        return 4; // allocation error caller retains List elements
 
     int bind_ret = add_binding(name, new_matrix, g_reg_table);
     if (bind_ret == 0)
@@ -18,14 +18,16 @@ int linalg_create_bind_matrix(struct List elements, size_t num_rows, size_t num_
     else
     {
         decref_obj(new_matrix);
-        switch (bind_ret)
+        switch (bind_ret) // List elements has been freed
         {
         case 1:
-            return 3; // internal error
-        case 2:
-            return 2; // allocation error
-        case 3:
             return 1; // invalid input
+        case 2:
+            return 2; // allocation
+        case 3:
+            return 3; // internal error
+        case 4:
+            return 3; // internal error
         case 5:
             return 3; // internal error
         default:
