@@ -36,8 +36,9 @@
  * Return codes (common to all linalg_create_bind_*()):
  *   0: Success.
  *   1: Invalid input or invalid library state (e.g., not initialized).
- *   2: Allocation/creation failure.
+ *   2: Allocation failure, heap allocated parameters destroyed, caller must not free.
  *   3: Internal/unspecified failure.
+ *   4: Create object failed, caller owns any heap allocated parameters.
  */
 
 /**
@@ -51,7 +52,7 @@
     1: Invalid input.
     2: Allocation failure, elements.list destroyed, caller must not free.
     3: Internal error.
-    4: Allocation failure, caller owns elements.list.
+    4: create object failed, caller owns elements.list.
  @pre
     1. name != NULL and name[0] != '\0'.
     2. elements.list != NULL.

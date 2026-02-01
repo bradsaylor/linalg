@@ -40,22 +40,25 @@ int linalg_create_bind_vector(struct List elements, const char* name)
 {
     struct ObjWrapper* new_vector = create_vector(elements);
     if (new_vector == NULL)
-        return 2;
+        return 4; // allocation error caller retains List elements
 
     int bind_ret = add_binding(name, new_vector, g_reg_table);
     if (bind_ret == 0)
         return 0;
+
     else
     {
         decref_obj(new_vector);
         switch (bind_ret)
         {
         case 1:
-            return 3; // internal error
-        case 2:
-            return 2; // allocation error
-        case 3:
             return 1; // invalid input
+        case 2:
+            return 2; // allocation
+        case 3:
+            return 3; // internal error
+        case 4:
+            return 3; // internal error
         case 5:
             return 3; // internal error
         default:
